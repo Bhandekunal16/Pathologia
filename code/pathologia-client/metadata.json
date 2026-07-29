@@ -1,0 +1,6 @@
+{
+  "name": "Pathologist Friend",
+  "description": "Professional medical software platform for pathologist user management, role-based access control, analytics dashboard, and profile management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
