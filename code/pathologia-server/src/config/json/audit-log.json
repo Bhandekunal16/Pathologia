@@ -1,0 +1,23 @@
+{
+  "AUDIT_LOG_FIELDS": {
+    "_id": 1,
+    "userId": 1,
+    "action": 1,
+    "entity": 1,
+    "entityId": 1,
+    "metadata": 1,
+    "hostname": 1,
+    "userAgent": 1,
+    "createdAt": 1
+  },
+  "USER_PROJECTION": {
+    "fullName": 1,
+    "email": 1
+  },
+  "MAX_RECENT_LIMIT" : 20,
+  "DEFAULT_RECENT_LIMIT" : 5,
+  "MAX_LIMIT" : 100,
+  "DEFAULT_LIMIT" : 10,
+  "DEFAULT_PAGE" : 1,
+  "USERS_COLLECTION" : "users"
+}
