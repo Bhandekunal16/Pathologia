@@ -13,41 +13,24 @@ const REGEX_ESCAPE_PATTERN = /[.*+?^${}()|[\]\\]/g;
 export class AuditLogPipelineBuilder {
   static buildMatchFilter(filter: AuditLogFilter): Record<string, unknown> {
     const match: Record<string, unknown> = {};
-
-    if (filter.action) {
-      match.action = filter.action;
-    }
-
+    if (filter.action) match.action = filter.action;
     const searchFilter = this.buildSearchFilter(filter.search);
-    if (searchFilter) {
-      Object.assign(match, searchFilter);
-    }
-
+    if (searchFilter) Object.assign(match, searchFilter);
     return match;
   }
 
-  /**
-   * Builds a search filter compatible with future Atlas Search / text-index migration.
-   * Uses exact matching where possible and regex only on free-text fields.
-   */
-  static buildSearchFilter(
-    search?: string,
-  ): Record<string, unknown> | null {
+  static buildSearchFilter(search?: string): Record<string, unknown> | null {
     const trimmed = search?.trim();
-    if (!trimmed) {
-      return null;
-    }
+    if (!trimmed) return null;
 
     const orConditions: Record<string, unknown>[] = [];
     const matchingActions = this.findMatchingActions(trimmed);
 
-    if (matchingActions.length > 0) {
+    if (matchingActions.length > 0)
       orConditions.push({ action: { $in: matchingActions } });
-    }
 
-    if (Types.ObjectId.isValid(trimmed) && trimmed.length === 24) {
+    if (Types.ObjectId.isValid(trimmed) && trimmed.length === 24)
       orConditions.push({ entityId: trimmed });
-    }
 
     const regex = new RegExp(
       trimmed.replace(REGEX_ESCAPE_PATTERN, '\\$&'),
