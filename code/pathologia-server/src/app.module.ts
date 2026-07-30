@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { EmailModule } from './email/email.module';
 import { AuditModule } from './audit/audit.module';
+import { PathologyTestsModule } from './pathology-tests/pathology-tests.module';
+import { InvitesModule } from './invites/invites.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
@@ -41,6 +43,8 @@ import { AuditInterceptor } from './common/interceptors/audit.interceptor';
     UsersModule,
     EmailModule,
     AuditModule,
+    PathologyTestsModule,
+    InvitesModule,
   ],
   providers: [
     {

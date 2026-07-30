@@ -44,13 +44,22 @@ export class EmailService {
   }
 
   private loadTemplates(): void {
-    const templateDir = path.join(__dirname, 'templates');
+    const candidateDirs = [
+      path.join(__dirname, '..', 'templates'),
+      path.join(__dirname, 'templates'),
+      path.join(process.cwd(), 'dist', 'email', 'templates'),
+      path.join(process.cwd(), 'src', 'email', 'templates'),
+    ];
+    const templateDir =
+      candidateDirs.find((dir) => fs.existsSync(dir)) ?? candidateDirs[0];
+
     const templateFiles = [
       'welcome',
       'activation',
       'reset-password',
       'temporary-password',
       'deactivated',
+      'invite',
     ];
 
     for (const name of templateFiles) {
@@ -58,6 +67,8 @@ export class EmailService {
       if (fs.existsSync(filePath)) {
         const source = fs.readFileSync(filePath, 'utf-8');
         this.templates.set(name, handlebars.compile(source));
+      } else {
+        this.logger.warn(`Email template not found: ${filePath}`);
       }
     }
   }
@@ -88,7 +99,8 @@ export class EmailService {
   private render(templateName: string, context: Record<string, string>): string {
     const template = this.templates.get(templateName);
     if (!template) {
-      return `<p>${JSON.stringify(context)}</p>`;
+      this.logger.error(`Email template "${templateName}" is not loaded`);
+      return `<p>We were unable to render this email. Please contact support.</p>`;
     }
     return template(context);
   }
@@ -132,5 +144,26 @@ export class EmailService {
   async sendDeactivationEmail(user: EmailUserContext): Promise<void> {
     const html = this.render('deactivated', { fullName: user.fullName });
     await this.sendMail(user.email, 'Your account has been deactivated', html);
+  }
+
+  async sendInviteEmail(params: {
+    email: string;
+    inviterName: string;
+    inviteLink: string;
+    expiresAt: Date;
+  }): Promise<void> {
+    const html = this.render('invite', {
+      inviterName: params.inviterName,
+      inviteLink: params.inviteLink,
+      expiresAt: params.expiresAt.toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }),
+    });
+    await this.sendMail(
+      params.email,
+      'You are invited to join Pathologia',
+      html,
+    );
   }
 }

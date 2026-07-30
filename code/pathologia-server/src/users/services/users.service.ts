@@ -123,7 +123,7 @@ export class UsersService {
     dto: UpdateStatusDto,
     auditContext?: {
       adminUserId?: string;
-      ipAddress?: string;
+      hostname?: string;
       userAgent?: string;
     },
   ): Promise<UserResponseDto> {
@@ -173,7 +173,7 @@ export class UsersService {
           data: { status: dto.status },
         },
       },
-      ipAddress: auditContext?.ipAddress,
+      hostname: auditContext?.hostname,
       userAgent: auditContext?.userAgent,
     });
 

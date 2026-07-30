@@ -16,5 +16,5 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Pathologist Friend client running on http://localhost:${PORT}`);
+  console.log(`Pathologia client running on http://localhost:${PORT}`);
 });

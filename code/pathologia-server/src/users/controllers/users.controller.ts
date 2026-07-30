@@ -25,6 +25,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Audited } from '../../common/decorators/audit.decorator';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
 import { AuditInterceptor } from '../../common/interceptors/audit.interceptor';
+import { getRequestHostname } from '../../common/utils/get-request-hostname.util';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
 import { Role } from '../../shared/enums/role.enum';
 import { Status } from '../../shared/enums/status.enum';
@@ -157,7 +158,7 @@ export class UsersController {
   ) {
     return this.usersService.updateStatus(id, dto, {
       adminUserId,
-      ipAddress: request.ip,
+      hostname: getRequestHostname(request),
       userAgent: request.headers['user-agent'],
     });
   }

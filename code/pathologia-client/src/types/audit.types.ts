@@ -7,7 +7,9 @@ export type AuditAction =
   | 'PASSWORD_RESET'
   | 'PASSWORD_CHANGE'
   | 'USER_ACTIVATE'
-  | 'USER_DEACTIVATE';
+  | 'USER_DEACTIVATE'
+  | 'USER_INVITE'
+  | 'USER_REGISTER';
 
 export interface AuditLog {
   id: string;
@@ -18,7 +20,7 @@ export interface AuditLog {
   entity: string;
   entityId?: string;
   metadata?: Record<string, unknown>;
-  ipAddress?: string;
+  hostname?: string;
   userAgent?: string;
   createdAt: string;
 }

@@ -25,8 +25,14 @@ export class PathologyTest {
   @Prop({ required: true, trim: true })
   manual: string;
 
+  @Prop({ type: Number, required: true, default: 0, min: 0 })
+  rate: number;
+
   @Prop({ type: String, enum: Status, required: true, default: Status.ACTIVE, index: true })
   status: Status;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const PathologyTestSchema = SchemaFactory.createForClass(PathologyTest);

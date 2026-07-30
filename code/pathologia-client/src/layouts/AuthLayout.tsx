@@ -20,7 +20,7 @@ export const AuthLayout: React.FC = () => {
       </main>
 
       <footer className="mt-8 text-center text-[11px] text-slate-500 z-10">
-        &copy; {new Date().getFullYear()} Pathologist Friend Clinical Diagnostics Platform. All rights reserved.
+        &copy; {new Date().getFullYear()} Pathologia Clinical Diagnostics Platform. All rights reserved.
       </footer>
     </div>
   );

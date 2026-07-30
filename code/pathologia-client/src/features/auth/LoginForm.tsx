@@ -34,7 +34,7 @@ export const LoginForm: React.FC = () => {
           <Activity className="w-8 h-8" />
         </div>
         <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Pathologist<span className="text-teal-600">Friend</span>
+          Path<span className="text-teal-600">ologia</span>
         </h2>
         <p className="mt-1 text-xs text-slate-500 max-w-xs leading-relaxed">
           Sign in to access your clinical pathology workspace & lab analytics

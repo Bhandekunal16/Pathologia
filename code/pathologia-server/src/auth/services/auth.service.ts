@@ -5,6 +5,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
+import { getRequestHostname } from '../../common/utils/get-request-hostname.util';
 import { AuditService } from '../../audit/services/audit.service';
 import { compareHash, hashValue } from '../../common/utils/hash.util';
 import { AuthJwtPayload } from '../../common/interfaces/jwt-payload.interface';
@@ -63,7 +64,7 @@ export class AuthService {
           entityId: user._id.toString(),
         },
       },
-      ipAddress: request?.ip,
+      hostname: getRequestHostname(request),
       userAgent: request?.headers['user-agent'],
     });
 
@@ -91,7 +92,7 @@ export class AuthService {
           entityId: userId,
         },
       },
-      ipAddress: request?.ip,
+      hostname: getRequestHostname(request),
       userAgent: request?.headers['user-agent'],
     });
   }
@@ -138,6 +139,50 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
     return UserResponseDto.fromDocument(user);
+  }
+
+  async issueAuthResponse(
+    user: {
+      _id: { toString(): string };
+      email: string;
+      username: string;
+      role: string;
+      fullName: string;
+      status: Status;
+    },
+    request?: Request,
+  ): Promise<AuthResponseDto> {
+    const userDocument = await this.userRepository.findById(user._id.toString());
+    if (!userDocument || userDocument.status !== Status.ACTIVE) {
+      throw new UnauthorizedException('User account is not active');
+    }
+
+    const tokens = await this.generateTokens(userDocument);
+    await this.userRepository.updateLastLogin(userDocument._id.toString());
+
+    await this.auditService.log({
+      userId: userDocument._id.toString(),
+      action: AuditAction.LOGIN,
+      entity: 'User',
+      entityId: userDocument._id.toString(),
+      metadata: {
+        request: {
+          method: request?.method ?? 'POST',
+          path: request?.path ?? '/invites/accept',
+        },
+        response: {
+          success: true,
+          entityId: userDocument._id.toString(),
+        },
+      },
+      hostname: getRequestHostname(request),
+      userAgent: request?.headers['user-agent'],
+    });
+
+    return {
+      ...tokens,
+      user: UserResponseDto.fromDocument(userDocument),
+    };
   }
 
   private async generateTokens(user: {

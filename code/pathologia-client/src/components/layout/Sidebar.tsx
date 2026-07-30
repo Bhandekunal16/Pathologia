@@ -10,6 +10,8 @@ import {
   ShieldCheck,
   Stethoscope,
   ArrowLeftRight,
+  FlaskConical,
+  UserPlus,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSidebarStore } from '../../store/sidebarStore';
@@ -33,6 +35,18 @@ export const Sidebar: React.FC = () => {
       path: '/users',
       icon: Users,
       roles: ['ADMIN'],
+    },
+    {
+      label: 'Pathology Tests',
+      path: '/pathology-tests',
+      icon: FlaskConical,
+      roles: ['ADMIN', 'PATHOLOGIST', 'USER'],
+    },
+    {
+      label: 'Invite User',
+      path: '/invite-user',
+      icon: UserPlus,
+      roles: ['PATHOLOGIST'],
     },
     {
       label: 'Request & Response',
@@ -79,7 +93,7 @@ export const Sidebar: React.FC = () => {
             {!isCollapsed && (
               <div className="flex flex-col">
                 <span className="text-base font-black text-white tracking-tight leading-none">
-                  Pathologist<span className="text-teal-400">Friend</span>
+                  Path<span className="text-teal-400">ologia</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mt-1">
                   Medical Platform

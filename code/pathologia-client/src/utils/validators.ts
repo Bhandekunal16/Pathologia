@@ -47,3 +47,24 @@ export const changePasswordSchema = z
     message: 'Passwords do not match',
     path: ['confirmPassword'],
   });
+
+export const inviteUserSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+});
+
+export const acceptInviteSchema = z.object({
+  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+export const pathologyTestSchema = z.object({
+  name: z.string().min(2, 'Test name must be at least 2 characters'),
+  code: z.string().min(2, 'Test code must be at least 2 characters'),
+  category: z.enum(['BLOOD', 'URINE', 'IMAGING', 'BODY_CHECKUP', 'OTHER']),
+  specimenType: z.string().min(2, 'Specimen type is required'),
+  description: z.string().optional(),
+  manual: z.string().min(10, 'Manual must be at least 10 characters'),
+  rate: z.coerce.number().min(0, 'Rate cannot be negative'),
+  status: z.enum(['ACTIVE', 'INACTIVE']),
+});

@@ -1,12 +1,44 @@
 import React from 'react';
-import { Menu, Activity, ShieldCheck, Stethoscope } from 'lucide-react';
+import { Menu, Activity, ShieldCheck, Stethoscope, User } from 'lucide-react';
 import { UserMenu } from './UserMenu';
 import { useSidebarStore } from '../../store/sidebarStore';
 import { useAuth } from '../../hooks/useAuth';
+import { UserRole } from '../../types/common.types';
+
+const roleHeaderConfig: Record<
+  UserRole,
+  {
+    portalLabel: string;
+    accessLabel: string;
+    icon: React.ComponentType<{ className?: string }>;
+    iconClassName: string;
+  }
+> = {
+  ADMIN: {
+    portalLabel: 'Admin Pathology Portal',
+    accessLabel: 'Admin Level Access',
+    icon: ShieldCheck,
+    iconClassName: 'text-purple-600',
+  },
+  PATHOLOGIST: {
+    portalLabel: 'Pathologist Pathology Portal',
+    accessLabel: 'Clinical Workspace Access',
+    icon: Stethoscope,
+    iconClassName: 'text-teal-600',
+  },
+  USER: {
+    portalLabel: 'User Pathology Portal',
+    accessLabel: 'Standard User Access',
+    icon: User,
+    iconClassName: 'text-slate-600',
+  },
+};
 
 export const Header: React.FC = () => {
   const { toggleMobile } = useSidebarStore();
   const { user } = useAuth();
+  const headerConfig = roleHeaderConfig[user?.role || 'USER'];
+  const AccessIcon = headerConfig.icon;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-6 shadow-2xs">
@@ -26,27 +58,18 @@ export const Header: React.FC = () => {
             <Activity className="w-4 h-4" />
           </div>
           <span className="text-sm font-extrabold text-slate-900 tracking-tight">
-            Pathologist<span className="text-teal-600">Friend</span>
+            Path<span className="text-teal-600">ologia</span>
           </span>
         </div>
 
         {/* Desktop Header Context Badge */}
         <div className="hidden lg:flex items-center space-x-2 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Clinical Pathology Portal</span>
+          <span>{headerConfig.portalLabel}</span>
           <span className="text-slate-300">|</span>
           <span className="text-slate-500 flex items-center space-x-1">
-            {user?.role === 'ADMIN' ? (
-              <>
-                <ShieldCheck className="w-3.5 h-3.5 text-purple-600 inline" />
-                <span>Admin Level Access</span>
-              </>
-            ) : (
-              <>
-                <Stethoscope className="w-3.5 h-3.5 text-teal-600 inline" />
-                <span>Pathologist Workspace</span>
-              </>
-            )}
+            <AccessIcon className={`w-3.5 h-3.5 inline ${headerConfig.iconClassName}`} />
+            <span>{headerConfig.accessLabel}</span>
           </span>
         </div>
       </div>

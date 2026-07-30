@@ -25,7 +25,7 @@ export class AuditLog {
   metadata?: Record<string, unknown>;
 
   @Prop()
-  ipAddress?: string;
+  hostname?: string;
 
   @Prop()
   userAgent?: string;

@@ -31,6 +31,8 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ customItems }) => {
       if (segment === 'edit') label = 'Edit User';
       if (segment === 'profile') label = 'My Profile';
       if (segment === 'request-response') label = 'Request & Response';
+      if (segment === 'pathology-tests') label = 'Pathology Tests';
+      if (segment === 'invite-user') label = 'Invite User';
 
       // Handle user IDs like 'user-123'
       if (segment.startsWith('user-') || !isNaN(Number(segment))) {

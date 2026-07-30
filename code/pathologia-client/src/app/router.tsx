@@ -15,7 +15,12 @@ const ViewUserPage = lazy(() => import('../pages/ViewUserPage').then((m) => ({ d
 const RequestResponsePage = lazy(() =>
   import('../pages/RequestResponsePage').then((m) => ({ default: m.RequestResponsePage }))
 );
+const PathologyTestListPage = lazy(() =>
+  import('../pages/PathologyTestListPage').then((m) => ({ default: m.PathologyTestListPage }))
+);
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const RegisterPage = lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const InviteUserPage = lazy(() => import('../pages/InviteUserPage').then((m) => ({ default: m.InviteUserPage })));
 const ForbiddenPage = lazy(() => import('../pages/ForbiddenPage').then((m) => ({ default: m.ForbiddenPage })));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
@@ -27,14 +32,21 @@ const SuspenseFallback = () => (
 
 export const router = createBrowserRouter([
   {
-    path: '/login',
     element: <AuthLayout />,
     children: [
       {
-        index: true,
+        path: '/login',
         element: (
           <Suspense fallback={<SuspenseFallback />}>
             <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/register',
+        element: (
+          <Suspense fallback={<SuspenseFallback />}>
+            <RegisterPage />
           </Suspense>
         ),
       },
@@ -66,6 +78,27 @@ export const router = createBrowserRouter([
                 <ProfilePage />
               </Suspense>
             ),
+          },
+          {
+            path: 'pathology-tests',
+            element: (
+              <Suspense fallback={<SuspenseFallback />}>
+                <PathologyTestListPage />
+              </Suspense>
+            ),
+          },
+          {
+            element: <RoleRoute allowedRoles={['PATHOLOGIST']} />,
+            children: [
+              {
+                path: 'invite-user',
+                element: (
+                  <Suspense fallback={<SuspenseFallback />}>
+                    <InviteUserPage />
+                  </Suspense>
+                ),
+              },
+            ],
           },
           {
             element: <RoleRoute allowedRoles={['ADMIN']} />,

@@ -24,6 +24,8 @@ const ACTION_OPTIONS = [
   { value: 'PASSWORD_CHANGE', label: 'Password Change' },
   { value: 'USER_ACTIVATE', label: 'User Activate' },
   { value: 'USER_DEACTIVATE', label: 'User Deactivate' },
+  { value: 'USER_INVITE', label: 'User Invite' },
+  { value: 'USER_REGISTER', label: 'User Register' },
 ];
 
 export const RequestResponsePage: React.FC = () => {
@@ -100,10 +102,10 @@ export const RequestResponsePage: React.FC = () => {
       ),
     },
     {
-      accessorKey: 'ipAddress',
-      header: 'IP Address',
+      accessorKey: 'hostname',
+      header: 'Hostname',
       cell: ({ row }) => (
-        <span className="text-[11px] text-slate-500">{row.original.ipAddress || 'N/A'}</span>
+        <span className="text-[11px] text-slate-500">{row.original.hostname || 'N/A'}</span>
       ),
     },
     {

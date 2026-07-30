@@ -79,7 +79,7 @@ export const UserForm: React.FC<UserFormProps> = ({
         <Input
           label="Email Address"
           type="email"
-          placeholder="e.g. j.doe@pathologistfriend.com"
+          placeholder="e.g. j.doe@pathologia.com"
           error={errors.email?.message}
           required
           {...register('email')}

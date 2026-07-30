@@ -11,7 +11,7 @@ export interface CreateAuditLogData {
   entity: string;
   entityId?: string;
   metadata?: Record<string, unknown>;
-  ipAddress?: string;
+  hostname?: string;
   userAgent?: string;
 }
 
@@ -44,7 +44,7 @@ export class AuditService {
       entity: data.entity,
       entityId: data.entityId,
       metadata: data.metadata,
-      ipAddress: data.ipAddress,
+      hostname: data.hostname,
       userAgent: data.userAgent,
     });
   }

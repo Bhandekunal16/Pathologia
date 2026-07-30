@@ -52,9 +52,9 @@ export class AuditLogResponseDto {
   @Expose()
   metadata?: Record<string, unknown>;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: 'localhost' })
   @Expose()
-  ipAddress?: string;
+  hostname?: string;
 
   @ApiPropertyOptional()
   @Expose()
@@ -76,7 +76,9 @@ export class AuditLogResponseDto {
     dto.entity = log.entity;
     dto.entityId = log.entityId;
     dto.metadata = log.metadata;
-    dto.ipAddress = log.ipAddress;
+    dto.hostname =
+      log.hostname ??
+      (log as AuditLogDocument & { ipAddress?: string }).ipAddress;
     dto.userAgent = log.userAgent;
     dto.createdAt = log.createdAt;
     return dto;

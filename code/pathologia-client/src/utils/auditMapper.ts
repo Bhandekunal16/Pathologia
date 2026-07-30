@@ -11,6 +11,8 @@ const ACTION_LABELS: Record<AuditLog['action'], string> = {
   PASSWORD_CHANGE: 'Password changed',
   USER_ACTIVATE: 'User account activated',
   USER_DEACTIVATE: 'User account deactivated',
+  USER_INVITE: 'User invitation sent',
+  USER_REGISTER: 'User self-registered via invite',
 };
 
 const ACTION_TYPES: Record<AuditLog['action'], RecentActivity['type']> = {
@@ -23,6 +25,8 @@ const ACTION_TYPES: Record<AuditLog['action'], RecentActivity['type']> = {
   PASSWORD_CHANGE: 'security',
   USER_ACTIVATE: 'user_management',
   USER_DEACTIVATE: 'user_management',
+  USER_INVITE: 'user_management',
+  USER_REGISTER: 'user_management',
 };
 
 export function formatAuditAction(action: AuditLog['action']): string {
@@ -66,7 +70,7 @@ export function getAuditRequestPayload(log: AuditLog): Record<string, unknown> {
     method: request.method ?? metadata.method ?? 'N/A',
     path: request.path ?? metadata.path ?? 'N/A',
     body: request.body ?? null,
-    ipAddress: log.ipAddress ?? null,
+    hostname: log.hostname ?? null,
     userAgent: log.userAgent ?? null,
     action: log.action,
     entity: log.entity,

@@ -25,6 +25,7 @@ export interface CreatePathologyTestData {
   specimenType: string;
   description?: string;
   manual: string;
+  rate?: number;
   status?: Status;
 }
 
@@ -35,6 +36,7 @@ export interface UpdatePathologyTestData {
   specimenType?: string;
   description?: string;
   manual?: string;
+  rate?: number;
   status?: Status;
 }
 

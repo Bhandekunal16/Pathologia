@@ -22,5 +22,18 @@ export default () => ({
     username: process.env.ADMIN_USERNAME ?? '',
     password: process.env.ADMIN_PASSWORD ?? '',
   },
-  corsOrigins: process.env.CORS_ORIGINS?.split(',') ?? ['http://localhost:3000'],
+  corsOrigins: (process.env.CORS_ORIGINS?.split(',') ?? [
+    'http://localhost:3000',
+    'http://localhost:4200',
+    'https://pathologia-client.vercel.app',
+  ])
+    .map((origin) => origin.trim().replace(/\/$/, ''))
+    .filter(Boolean),
+  frontendUrl: (
+    process.env.FRONTEND_URL ??
+    process.env.CORS_ORIGINS?.split(',')?.find((origin) =>
+      origin.includes('pathologia-client.vercel.app'),
+    ) ??
+    'http://localhost:4200'
+  ).replace(/\/$/, ''),
 });

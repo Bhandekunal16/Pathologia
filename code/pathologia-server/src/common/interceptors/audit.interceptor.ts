@@ -12,6 +12,7 @@ import { AuditMetadata } from '../interfaces/audit-metadata.interface';
 import { AuditService } from '../../audit/services/audit.service';
 import { AuthenticatedUser } from '../interfaces/jwt-payload.interface';
 import { sanitizeAuditPayload } from '../utils/sanitize-audit.util';
+import { getRequestHostname } from '../utils/get-request-hostname.util';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
@@ -71,7 +72,7 @@ export class AuditInterceptor implements NestInterceptor {
               data: sanitizeAuditPayload(responseData),
             },
           },
-          ipAddress: request.ip,
+          hostname: getRequestHostname(request),
           userAgent: request.headers['user-agent'],
         });
       }),
