@@ -27,7 +27,10 @@ export class AuditController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'action', required: false, enum: AuditAction })
-  @ApiResponse({ status: 200, description: 'Audit logs retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Audit logs retrieved successfully',
+  })
   findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
@@ -40,15 +43,24 @@ export class AuditController {
   @Get('recent')
   @ApiOperation({ summary: 'Get recent audit logs (Admin only)' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiResponse({ status: 200, description: 'Recent audit logs retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Recent audit logs retrieved successfully',
+  })
   findRecent(@Query('limit') limit?: number) {
     return this.auditService.findRecent(limit);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get audit log by ID (Admin only)' })
-  @ApiResponse({ status: 200, description: 'Audit log retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'Audit log not found' })
+  @ApiResponse({
+    status: 200,
+    description: 'Audit log retrieved successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Audit log not found',
+  })
   findOne(@Param('id') id: string) {
     return this.auditService.findById(id);
   }
