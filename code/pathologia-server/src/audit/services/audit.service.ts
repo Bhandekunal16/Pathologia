@@ -108,10 +108,32 @@ export class AuditService {
     };
   }
 
-  async findRecent(limit = 5) {
+  async findRecent(limit = 5): Promise<AuditLogResponseDto[]> {
     const safeLimit = Math.min(Math.max(limit, 1), 20);
-    const result = await this.findAll({ page: 1, limit: safeLimit });
-    return result.items;
+    const fields = {
+      action: 1,
+      entity: 1,
+      entityId: 1,
+      metadata: 1,
+      hostname: 1,
+      userAgent: 1,
+      createdAt: 1,
+      userId: 1,
+    };
+
+    const logs = await this.auditLogModel
+      .find({}, fields)
+      .sort({ createdAt: -1 })
+      .limit(safeLimit)
+      .populate({
+        path: 'userId',
+        select: 'fullName email',
+        options: { lean: true },
+      })
+      .lean()
+      .exec();
+
+    return logs.map((log) => AuditLogResponseDto.fromDocument(log));
   }
 
   async findById(id: string) {
