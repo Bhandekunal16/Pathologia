@@ -15,14 +15,16 @@ interface AuditLogJsonConfig {
 
 const config = rawConfig as AuditLogJsonConfig;
 
-export const USERS_COLLECTION = config.USERS_COLLECTION;
-export const DEFAULT_PAGE = config.DEFAULT_PAGE;
-export const DEFAULT_LIMIT = config.DEFAULT_LIMIT;
-export const MAX_LIMIT = config.MAX_LIMIT;
-export const DEFAULT_RECENT_LIMIT = config.DEFAULT_RECENT_LIMIT;
-export const MAX_RECENT_LIMIT = config.MAX_RECENT_LIMIT;
-export const AUDIT_LOG_FIELDS = config.AUDIT_LOG_FIELDS;
-export const USER_PROJECTION = config.USER_PROJECTION;
+export const {
+  AUDIT_LOG_FIELDS,
+  USER_PROJECTION,
+  MAX_RECENT_LIMIT,
+  DEFAULT_RECENT_LIMIT,
+  MAX_LIMIT,
+  DEFAULT_LIMIT,
+  DEFAULT_PAGE,
+  USERS_COLLECTION,
+} = config;
 
 export const RECENT_FIELDS = AUDIT_LOG_FIELDS;
 export const DETAIL_FIELDS = AUDIT_LOG_FIELDS;
