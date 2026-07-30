@@ -9,6 +9,20 @@ interface PopulatedAuditUser {
   email: string;
 }
 
+interface AuditLogSource {
+  _id: { toString(): string };
+  userId?: { toString(): string };
+  user?: PopulatedAuditUser;
+  action: AuditAction;
+  entity: string;
+  entityId?: string;
+  metadata?: Record<string, unknown>;
+  hostname?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+}
+
 export class AuditLogResponseDto {
   @ApiProperty()
   @Expose()
@@ -17,22 +31,25 @@ export class AuditLogResponseDto {
 
   @ApiPropertyOptional()
   @Expose()
-  @Transform(({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
-    obj.userId?.toString(),
+  @Transform(
+    ({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
+      obj.userId?.toString(),
   )
   userId?: string;
 
   @ApiPropertyOptional()
   @Expose()
-  @Transform(({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
-    obj.user?.fullName,
+  @Transform(
+    ({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
+      obj.user?.fullName,
   )
   userName?: string;
 
   @ApiPropertyOptional()
   @Expose()
-  @Transform(({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
-    obj.user?.email,
+  @Transform(
+    ({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
+      obj.user?.email,
   )
   userEmail?: string;
 
@@ -64,9 +81,7 @@ export class AuditLogResponseDto {
   @Expose()
   createdAt: Date;
 
-  static fromDocument(
-    log: AuditLogDocument & { user?: PopulatedAuditUser },
-  ): AuditLogResponseDto {
+  static fromDocument(log: AuditLogSource): AuditLogResponseDto {
     const dto = new AuditLogResponseDto();
     dto.id = log._id.toString();
     dto.userId = log.userId?.toString();
@@ -76,9 +91,7 @@ export class AuditLogResponseDto {
     dto.entity = log.entity;
     dto.entityId = log.entityId;
     dto.metadata = log.metadata;
-    dto.hostname =
-      log.hostname ??
-      (log as AuditLogDocument & { ipAddress?: string }).ipAddress;
+    dto.hostname = log.hostname ?? log.ipAddress;
     dto.userAgent = log.userAgent;
     dto.createdAt = log.createdAt;
     return dto;
