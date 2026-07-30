@@ -93,7 +93,7 @@ export const RequestResponsePage: React.FC = () => {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (
-        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+        <span className="inline-flex whitespace-nowrap px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
           {formatAuditAction(row.original.action)}
         </span>
       ),
