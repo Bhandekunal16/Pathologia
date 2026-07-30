@@ -50,6 +50,12 @@ export const Sidebar: React.FC = () => {
       roles: ['PATHOLOGIST', 'USER'],
     },
     {
+      label: 'Blood Test Tracking',
+      path: '/blood-test-tracking',
+      icon: Activity,
+      roles: ['PATHOLOGIST', 'USER'],
+    },
+    {
       label: 'Invite User',
       path: '/invite-user',
       icon: UserPlus,

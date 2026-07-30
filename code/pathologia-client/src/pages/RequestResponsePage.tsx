@@ -30,6 +30,8 @@ const ACTION_OPTIONS = [
   { value: 'TEST_BOOKING_UPDATE', label: 'Test Booking Update' },
   { value: 'TEST_BOOKING_CANCEL', label: 'Test Booking Cancel' },
   { value: 'TEST_BOOKING_OTP_SEND', label: 'Test Booking OTP Send' },
+  { value: 'BLOOD_TEST_STATUS_UPDATE', label: 'Blood Test Status Update' },
+  { value: 'BLOOD_TEST_REPORT_UPLOAD', label: 'Blood Test Report Upload' },
 ];
 
 export const RequestResponsePage: React.FC = () => {

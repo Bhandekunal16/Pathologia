@@ -6,6 +6,8 @@ import {
   SendBookingOtpPayload,
   TestBookingFilters,
   UpdateTestBookingPayload,
+  UpdateBloodTestTrackingPayload,
+  UploadBloodTestReportPayload,
 } from '../types/test-booking.types';
 
 export function useTestBookings(filters?: TestBookingFilters) {
@@ -50,6 +52,38 @@ export function useTestBookings(filters?: TestBookingFilters) {
     },
   });
 
+  const updateTrackingMutation = useMutation({
+    mutationFn: ({
+      bookingId,
+      testItemId,
+      payload,
+    }: {
+      bookingId: string;
+      testItemId: string;
+      payload: UpdateBloodTestTrackingPayload;
+    }) => testBookingsApi.updateBloodTestTracking(bookingId, testItemId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['test-bookings'] });
+      toast.success('Blood test status updated');
+    },
+  });
+
+  const uploadReportMutation = useMutation({
+    mutationFn: ({
+      bookingId,
+      testItemId,
+      payload,
+    }: {
+      bookingId: string;
+      testItemId: string;
+      payload: UploadBloodTestReportPayload;
+    }) => testBookingsApi.uploadBloodTestReport(bookingId, testItemId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['test-bookings'] });
+      toast.success('Report uploaded successfully');
+    },
+  });
+
   return {
     bookingsData: bookingsQuery.data?.data,
     isLoadingBookings: bookingsQuery.isLoading,
@@ -66,5 +100,11 @@ export function useTestBookings(filters?: TestBookingFilters) {
 
     updateBooking: updateBookingMutation.mutateAsync,
     isUpdatingBooking: updateBookingMutation.isPending,
+
+    updateBloodTestTracking: updateTrackingMutation.mutateAsync,
+    isUpdatingTracking: updateTrackingMutation.isPending,
+
+    uploadBloodTestReport: uploadReportMutation.mutateAsync,
+    isUploadingReport: uploadReportMutation.isPending,
   };
 }

@@ -6,6 +6,11 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { AuditService } from '../../audit/services/audit.service';
+import {
+  compressForStorage,
+  decompressFromStorage,
+  validateReportSize,
+} from '../../common/utils/compress-storage.util';
 import { getRequestHostname } from '../../common/utils/get-request-hostname.util';
 import {
   generateOtp,
@@ -16,17 +21,26 @@ import {
 import { EmailService } from '../../email/services/email.service';
 import { PathologyTestRepository } from '../../pathology-tests/repositories/pathology-test.repository';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
+import {
+  BLOOD_TEST_STATUS_ORDER,
+  BloodTestTrackingStatus,
+} from '../../shared/enums/blood-test-tracking-status.enum';
 import { BookingStatus } from '../../shared/enums/booking-status.enum';
 import { Role } from '../../shared/enums/role.enum';
 import { Status } from '../../shared/enums/status.enum';
+import { TestCategory } from '../../shared/enums/test-category.enum';
 import { UserRepository } from '../../users/repositories/user.repository';
 import { CreateTestBookingDto } from '../dto/create-test-booking.dto';
 import { SendBookingOtpResponseDto } from '../dto/send-booking-otp-response.dto';
 import { TestBookingResponseDto } from '../dto/test-booking-response.dto';
 import { UpdateTestBookingDto } from '../dto/update-test-booking.dto';
+import { UpdateBloodTestTrackingDto } from '../dto/update-blood-test-tracking.dto';
+import { UploadBloodTestReportDto } from '../dto/upload-blood-test-report.dto';
 import { BookingOtpRepository } from '../repositories/booking-otp.repository';
 import { TestBookingRepository } from '../repositories/test-booking.repository';
 import { TestBookingListFilter } from '../repositories/test-booking.repository.interface';
+import { BookedTestItem } from '../schemas/booked-test-item.schema';
+import { TestBookingDocument } from '../schemas/test-booking.schema';
 
 @Injectable()
 export class TestBookingsService {
@@ -149,6 +163,7 @@ export class TestBookingsService {
         testId: test._id.toString(),
         name: test.name,
         code: test.code,
+        category: test.category,
         rate: test.rate ?? 0,
       })),
       scheduledAt,
@@ -326,7 +341,13 @@ export class TestBookingsService {
     }
 
     const updateData: {
-      tests?: { testId: string; name: string; code: string; rate: number }[];
+      tests?: {
+        testId: string;
+        name: string;
+        code: string;
+        category: TestCategory;
+        rate: number;
+      }[];
       scheduledAt?: Date;
       totalAmount?: number;
       notes?: string;
@@ -338,6 +359,7 @@ export class TestBookingsService {
         testId: test._id.toString(),
         name: test.name,
         code: test.code,
+        category: test.category,
         rate: test.rate ?? 0,
       }));
       updateData.totalAmount = tests.reduce((sum, test) => sum + (test.rate ?? 0), 0);
@@ -384,6 +406,264 @@ export class TestBookingsService {
       patientEmail: patient?.email,
       bookedByName: bookedBy?.fullName,
     });
+  }
+
+  async updateBloodTestTracking(
+    bookingId: string,
+    testItemId: string,
+    dto: UpdateBloodTestTrackingDto,
+    currentUserId: string,
+    currentUserRole: Role,
+    request?: Request,
+  ): Promise<TestBookingResponseDto> {
+    if (currentUserRole !== Role.PATHOLOGIST) {
+      throw new ForbiddenException('Only pathologists can update blood test tracking');
+    }
+
+    const booking = await this.testBookingRepository.findById(bookingId);
+    if (!booking) {
+      throw new NotFoundException('Test booking not found');
+    }
+
+    if (booking.status !== BookingStatus.CONFIRMED) {
+      throw new BadRequestException('Tracking is only available for confirmed bookings');
+    }
+
+    const testItem = this.findBloodTestItem(booking, testItemId);
+    this.validateSequentialStatus(testItem.trackingStatus, dto.status);
+
+    const now = new Date();
+    const fields: Record<string, unknown> = {
+      trackingStatus: dto.status,
+      statusUpdatedAt: now,
+    };
+
+    if (dto.status === BloodTestTrackingStatus.BLOOD_COLLECTED) {
+      fields.bloodCollectedAt = now;
+    } else if (dto.status === BloodTestTrackingStatus.PROCESSING) {
+      fields.processingAt = now;
+    } else if (dto.status === BloodTestTrackingStatus.PROCESSING_COMPLETED) {
+      fields.processingCompletedAt = now;
+    } else if (dto.status === BloodTestTrackingStatus.REPORT_DELIVERED) {
+      fields.reportDeliveredAt = now;
+    }
+
+    const updated = await this.testBookingRepository.updateTestItem(
+      bookingId,
+      testItemId,
+      fields,
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Test item not found in booking');
+    }
+
+    const patient = await this.userRepository.findById(booking.patientUserId.toString());
+
+    if (
+      dto.status === BloodTestTrackingStatus.PROCESSING_COMPLETED ||
+      dto.status === BloodTestTrackingStatus.REPORT_DELIVERED
+    ) {
+      void this.emailService.sendBloodTestStatusEmail({
+        email: patient?.email ?? '',
+        patientName: patient?.fullName ?? 'Patient',
+        testName: testItem.name,
+        status: dto.status,
+      });
+    }
+
+    await this.auditService.log({
+      userId: currentUserId,
+      action: AuditAction.BLOOD_TEST_STATUS_UPDATE,
+      entity: 'TestBooking',
+      metadata: {
+        request: {
+          method: request?.method ?? 'PATCH',
+          path: request?.path,
+          body: { bookingId, testItemId, status: dto.status },
+        },
+        response: { success: true },
+      },
+      hostname: getRequestHostname(request),
+      userAgent: request?.headers['user-agent'],
+    });
+
+    return this.enrichBookingResponse(updated);
+  }
+
+  async uploadBloodTestReport(
+    bookingId: string,
+    testItemId: string,
+    dto: UploadBloodTestReportDto,
+    currentUserId: string,
+    currentUserRole: Role,
+    request?: Request,
+  ): Promise<TestBookingResponseDto> {
+    if (currentUserRole !== Role.PATHOLOGIST) {
+      throw new ForbiddenException('Only pathologists can upload blood test reports');
+    }
+
+    const booking = await this.testBookingRepository.findById(bookingId);
+    if (!booking) {
+      throw new NotFoundException('Test booking not found');
+    }
+
+    const testItem = this.findBloodTestItem(booking, testItemId);
+    this.ensureReportUploadAllowed(testItem.trackingStatus);
+
+    let fileBuffer: Buffer;
+    try {
+      fileBuffer = Buffer.from(dto.data, 'base64');
+      validateReportSize(fileBuffer);
+    } catch {
+      throw new BadRequestException('Invalid or oversized report file');
+    }
+
+    const compressed = compressForStorage(fileBuffer);
+    const now = new Date();
+
+    const updated = await this.testBookingRepository.updateTestItem(
+      bookingId,
+      testItemId,
+      {
+        reportData: compressed,
+        reportMimeType: dto.mimeType,
+        reportFileName: dto.fileName,
+        reportUploadedAt: now,
+        reportUploadedBy: currentUserId,
+      },
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Test item not found in booking');
+    }
+
+    const patient = await this.userRepository.findById(booking.patientUserId.toString());
+    void this.emailService.sendBloodTestReportUploadedEmail({
+      email: patient?.email ?? '',
+      patientName: patient?.fullName ?? 'Patient',
+      testName: testItem.name,
+      fileName: dto.fileName,
+    });
+
+    await this.auditService.log({
+      userId: currentUserId,
+      action: AuditAction.BLOOD_TEST_REPORT_UPLOAD,
+      entity: 'TestBooking',
+      metadata: {
+        request: {
+          method: request?.method ?? 'POST',
+          path: request?.path,
+          body: { bookingId, testItemId, fileName: dto.fileName },
+        },
+        response: { success: true },
+      },
+      hostname: getRequestHostname(request),
+      userAgent: request?.headers['user-agent'],
+    });
+
+    return this.enrichBookingResponse(updated);
+  }
+
+  async getBloodTestReport(
+    bookingId: string,
+    testItemId: string,
+    currentUserId: string,
+    currentUserRole: Role,
+  ): Promise<{ buffer: Buffer; fileName: string; mimeType: string }> {
+    const booking = await this.testBookingRepository.findById(bookingId);
+    if (!booking) {
+      throw new NotFoundException('Test booking not found');
+    }
+
+    this.ensureCanAccessBooking(booking, currentUserId, currentUserRole);
+    const testItem = this.findBloodTestItem(booking, testItemId);
+
+    if (!testItem.reportData) {
+      throw new NotFoundException('Report has not been uploaded yet');
+    }
+
+    this.ensureReportDownloadAllowed(testItem.trackingStatus);
+
+    return {
+      buffer: decompressFromStorage(testItem.reportData),
+      fileName: testItem.reportFileName ?? 'report.pdf',
+      mimeType: testItem.reportMimeType ?? 'application/octet-stream',
+    };
+  }
+
+  private async enrichBookingResponse(
+    booking: TestBookingDocument,
+  ): Promise<TestBookingResponseDto> {
+    const [patient, bookedBy] = await Promise.all([
+      this.userRepository.findById(booking.patientUserId.toString()),
+      this.userRepository.findById(booking.bookedByUserId.toString()),
+    ]);
+
+    return TestBookingResponseDto.fromDocument(booking, {
+      patientName: patient?.fullName,
+      patientEmail: patient?.email,
+      bookedByName: bookedBy?.fullName,
+    });
+  }
+
+  private findBloodTestItem(
+    booking: TestBookingDocument,
+    testItemId: string,
+  ): BookedTestItem {
+    const item = booking.tests.find(
+      (test) => test._id?.toString() === testItemId,
+    );
+
+    if (!item) {
+      throw new NotFoundException('Test item not found in booking');
+    }
+
+    if (item.category !== TestCategory.BLOOD) {
+      throw new BadRequestException('Tracking is only available for blood tests');
+    }
+
+    return item;
+  }
+
+  private validateSequentialStatus(
+    current: BloodTestTrackingStatus | undefined,
+    next: BloodTestTrackingStatus,
+  ): void {
+    const currentIndex = current
+      ? BLOOD_TEST_STATUS_ORDER.indexOf(current)
+      : -1;
+    const nextIndex = BLOOD_TEST_STATUS_ORDER.indexOf(next);
+
+    if (nextIndex !== currentIndex + 1) {
+      throw new BadRequestException(
+        'Blood test status must be updated sequentially without skipping steps',
+      );
+    }
+  }
+
+  private ensureReportUploadAllowed(
+    status: BloodTestTrackingStatus | undefined,
+  ): void {
+    if (
+      status !== BloodTestTrackingStatus.PROCESSING_COMPLETED &&
+      status !== BloodTestTrackingStatus.REPORT_DELIVERED
+    ) {
+      throw new BadRequestException(
+        'Report can only be uploaded after processing is completed',
+      );
+    }
+  }
+
+  private ensureReportDownloadAllowed(
+    status: BloodTestTrackingStatus | undefined,
+  ): void {
+    if (
+      status !== BloodTestTrackingStatus.PROCESSING_COMPLETED &&
+      status !== BloodTestTrackingStatus.REPORT_DELIVERED
+    ) {
+      throw new ForbiddenException('Report is not available yet');
+    }
   }
 
   private async verifyPatientOtp(

@@ -21,6 +21,9 @@ const PathologyTestListPage = lazy(() =>
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 const RegisterPage = lazy(() => import('../pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const TestBookingPage = lazy(() => import('../pages/TestBookingPage').then((m) => ({ default: m.TestBookingPage })));
+const BloodTestTrackingPage = lazy(() =>
+  import('../pages/BloodTestTrackingPage').then((m) => ({ default: m.BloodTestTrackingPage }))
+);
 const InviteUserPage = lazy(() => import('../pages/InviteUserPage').then((m) => ({ default: m.InviteUserPage })));
 const ForbiddenPage = lazy(() => import('../pages/ForbiddenPage').then((m) => ({ default: m.ForbiddenPage })));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
@@ -96,6 +99,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<SuspenseFallback />}>
                     <TestBookingPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: 'blood-test-tracking',
+                element: (
+                  <Suspense fallback={<SuspenseFallback />}>
+                    <BloodTestTrackingPage />
                   </Suspense>
                 ),
               },

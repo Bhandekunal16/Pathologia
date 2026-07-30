@@ -13,7 +13,9 @@ export type AuditAction =
   | 'TEST_BOOKING_CREATE'
   | 'TEST_BOOKING_UPDATE'
   | 'TEST_BOOKING_CANCEL'
-  | 'TEST_BOOKING_OTP_SEND';
+  | 'TEST_BOOKING_OTP_SEND'
+  | 'BLOOD_TEST_STATUS_UPDATE'
+  | 'BLOOD_TEST_REPORT_UPLOAD';
 
 export interface AuditLog {
   id: string;

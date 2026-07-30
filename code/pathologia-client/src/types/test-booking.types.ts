@@ -1,10 +1,29 @@
 export type BookingStatus = 'CONFIRMED' | 'CANCELLED';
+export type TestCategory = 'BLOOD' | 'URINE' | 'IMAGING' | 'BODY_CHECKUP' | 'OTHER';
+
+export type BloodTestTrackingStatus =
+  | 'BLOOD_COLLECTED'
+  | 'PROCESSING'
+  | 'PROCESSING_COMPLETED'
+  | 'REPORT_DELIVERED';
 
 export interface BookedTestItem {
+  id: string;
   testId: string;
   name: string;
   code: string;
+  category?: TestCategory;
   rate: number;
+  trackingStatus?: BloodTestTrackingStatus;
+  bloodCollectedAt?: string;
+  processingAt?: string;
+  processingCompletedAt?: string;
+  reportDeliveredAt?: string;
+  statusUpdatedAt?: string;
+  reportFileName?: string;
+  reportMimeType?: string;
+  reportUploadedAt?: string;
+  hasReport: boolean;
 }
 
 export interface TestBooking {
@@ -33,6 +52,16 @@ export interface UpdateTestBookingPayload {
   testIds?: string[];
   scheduledAt?: string;
   notes?: string;
+}
+
+export interface UpdateBloodTestTrackingPayload {
+  status: BloodTestTrackingStatus;
+}
+
+export interface UploadBloodTestReportPayload {
+  fileName: string;
+  mimeType: string;
+  data: string;
 }
 
 export interface CreateTestBookingPayload {

@@ -62,6 +62,8 @@ export class EmailService {
       'invite',
       'booking-otp',
       'booking-confirmation',
+      'blood-test-status',
+      'blood-test-report-uploaded',
     ];
 
     for (const name of templateFiles) {
@@ -214,5 +216,52 @@ export class EmailService {
       totalAmount: `₹${params.totalAmount}`,
     });
     await this.sendMail(params.email, 'Your Pathologia test booking is confirmed', html);
+  }
+
+  async sendBloodTestStatusEmail(params: {
+    email: string;
+    patientName: string;
+    testName: string;
+    status: string;
+  }): Promise<void> {
+    const statusLabel =
+      params.status === 'PROCESSING_COMPLETED'
+        ? 'Processing Completed'
+        : 'Report Delivered';
+
+    const html = this.render('blood-test-status', {
+      patientName: params.patientName,
+      testName: params.testName,
+      statusLabel,
+      message:
+        params.status === 'PROCESSING_COMPLETED'
+          ? 'Your blood test sample processing has been completed. The report will be available soon.'
+          : 'Your blood test report has been delivered. You can view and download it from your Pathologia portal.',
+    });
+
+    await this.sendMail(
+      params.email,
+      `Pathologia: ${statusLabel} - ${params.testName}`,
+      html,
+    );
+  }
+
+  async sendBloodTestReportUploadedEmail(params: {
+    email: string;
+    patientName: string;
+    testName: string;
+    fileName: string;
+  }): Promise<void> {
+    const html = this.render('blood-test-report-uploaded', {
+      patientName: params.patientName,
+      testName: params.testName,
+      fileName: params.fileName,
+    });
+
+    await this.sendMail(
+      params.email,
+      `Pathologia: Report uploaded for ${params.testName}`,
+      html,
+    );
   }
 }

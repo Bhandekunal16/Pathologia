@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -16,7 +17,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { ResponseMessage } from '../../common/decorators/response-message.decorator';
@@ -30,6 +31,8 @@ import { SendBookingOtpDto } from '../dto/send-booking-otp.dto';
 import { SendBookingOtpResponseDto } from '../dto/send-booking-otp-response.dto';
 import { TestBookingResponseDto } from '../dto/test-booking-response.dto';
 import { UpdateTestBookingDto } from '../dto/update-test-booking.dto';
+import { UpdateBloodTestTrackingDto } from '../dto/update-blood-test-tracking.dto';
+import { UploadBloodTestReportDto } from '../dto/upload-blood-test-report.dto';
 import { TestBookingsService } from '../services/test-bookings.service';
 
 @ApiTags('Test Bookings')
@@ -87,6 +90,72 @@ export class TestBookingsController {
       user.sub,
       user.role as Role,
     );
+  }
+
+  @Patch(':bookingId/tests/:testItemId/tracking')
+  @Roles(Role.PATHOLOGIST)
+  @ResponseMessage('Blood test status updated successfully')
+  @ApiOperation({ summary: 'Update blood test tracking status' })
+  updateBloodTestTracking(
+    @Param('bookingId') bookingId: string,
+    @Param('testItemId') testItemId: string,
+    @Body() dto: UpdateBloodTestTrackingDto,
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() request: Request,
+  ) {
+    return this.testBookingsService.updateBloodTestTracking(
+      bookingId,
+      testItemId,
+      dto,
+      user.sub,
+      user.role as Role,
+      request,
+    );
+  }
+
+  @Post(':bookingId/tests/:testItemId/report')
+  @Roles(Role.PATHOLOGIST)
+  @ResponseMessage('Blood test report uploaded successfully')
+  @ApiOperation({ summary: 'Upload blood test report' })
+  uploadBloodTestReport(
+    @Param('bookingId') bookingId: string,
+    @Param('testItemId') testItemId: string,
+    @Body() dto: UploadBloodTestReportDto,
+    @CurrentUser() user: AuthenticatedUser,
+    @Req() request: Request,
+  ) {
+    return this.testBookingsService.uploadBloodTestReport(
+      bookingId,
+      testItemId,
+      dto,
+      user.sub,
+      user.role as Role,
+      request,
+    );
+  }
+
+  @Get(':bookingId/tests/:testItemId/report')
+  @Roles(Role.ADMIN, Role.PATHOLOGIST, Role.USER)
+  @ApiOperation({ summary: 'Download blood test report' })
+  async downloadBloodTestReport(
+    @Param('bookingId') bookingId: string,
+    @Param('testItemId') testItemId: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Res() res: Response,
+  ) {
+    const report = await this.testBookingsService.getBloodTestReport(
+      bookingId,
+      testItemId,
+      user.sub,
+      user.role as Role,
+    );
+
+    res.setHeader('Content-Type', report.mimeType);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${report.fileName}"`,
+    );
+    res.send(report.buffer);
   }
 
   @Get(':id')

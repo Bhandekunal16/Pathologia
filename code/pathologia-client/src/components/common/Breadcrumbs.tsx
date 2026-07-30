@@ -33,6 +33,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ customItems }) => {
       if (segment === 'request-response') label = 'Request & Response';
       if (segment === 'pathology-tests') label = 'Pathology Tests';
       if (segment === 'test-booking') label = 'Test Booking';
+      if (segment === 'blood-test-tracking') label = 'Blood Test Tracking';
       if (segment === 'invite-user') label = 'Invite User';
 
       // Handle user IDs like 'user-123'

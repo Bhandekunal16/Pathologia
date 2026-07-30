@@ -17,6 +17,8 @@ const ACTION_LABELS: Record<AuditLog['action'], string> = {
   TEST_BOOKING_UPDATE: 'Test booking updated',
   TEST_BOOKING_CANCEL: 'Test booking cancelled',
   TEST_BOOKING_OTP_SEND: 'Booking OTP sent to patient',
+  BLOOD_TEST_STATUS_UPDATE: 'Blood test status updated',
+  BLOOD_TEST_REPORT_UPLOAD: 'Blood test report uploaded',
 };
 
 const ACTION_TYPES: Record<AuditLog['action'], RecentActivity['type']> = {
@@ -35,6 +37,8 @@ const ACTION_TYPES: Record<AuditLog['action'], RecentActivity['type']> = {
   TEST_BOOKING_UPDATE: 'user_management',
   TEST_BOOKING_CANCEL: 'user_management',
   TEST_BOOKING_OTP_SEND: 'security',
+  BLOOD_TEST_STATUS_UPDATE: 'user_management',
+  BLOOD_TEST_REPORT_UPLOAD: 'user_management',
 };
 
 export function formatAuditAction(action: AuditLog['action']): string {

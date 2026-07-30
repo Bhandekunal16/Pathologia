@@ -2,34 +2,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Transform } from 'class-transformer';
 import { BookingStatus } from '../../shared/enums/booking-status.enum';
 import { TestBookingDocument } from '../schemas/test-booking.schema';
-import { BookedTestItem } from '../schemas/booked-test-item.schema';
+import { BookedTestItemResponseDto } from './booked-test-item-response.dto';
 
-export class BookedTestItemResponseDto {
-  @ApiProperty()
-  @Expose()
-  testId: string;
-
-  @ApiProperty()
-  @Expose()
-  name: string;
-
-  @ApiProperty()
-  @Expose()
-  code: string;
-
-  @ApiProperty()
-  @Expose()
-  rate: number;
-
-  static fromItem(item: BookedTestItem): BookedTestItemResponseDto {
-    const dto = new BookedTestItemResponseDto();
-    dto.testId = item.testId;
-    dto.name = item.name;
-    dto.code = item.code;
-    dto.rate = item.rate;
-    return dto;
-  }
-}
+export { BookedTestItemResponseDto };
 
 export class TestBookingResponseDto {
   @ApiProperty()

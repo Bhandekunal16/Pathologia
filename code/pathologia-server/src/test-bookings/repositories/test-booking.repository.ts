@@ -100,4 +100,23 @@ export class TestBookingRepository implements ITestBookingRepository {
       .findByIdAndUpdate(id, { $set: { status } }, { new: true })
       .exec();
   }
+
+  async updateTestItem(
+    bookingId: string,
+    testItemId: string,
+    fields: Record<string, unknown>,
+  ): Promise<TestBookingDocument | null> {
+    const setFields: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(fields)) {
+      setFields[`tests.$.${key}`] = value;
+    }
+
+    return this.testBookingModel
+      .findOneAndUpdate(
+        { _id: bookingId, 'tests._id': testItemId },
+        { $set: setFields },
+        { new: true },
+      )
+      .exec();
+  }
 }

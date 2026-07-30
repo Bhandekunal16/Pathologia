@@ -7,6 +7,8 @@ import {
   TestBooking,
   TestBookingFilters,
   UpdateTestBookingPayload,
+  UpdateBloodTestTrackingPayload,
+  UploadBloodTestReportPayload,
 } from '../types/test-booking.types';
 import { buildQueryParams } from '../utils/apiPayloads';
 import {
@@ -88,5 +90,46 @@ export const testBookingsApi = {
       ...res.data,
       data: res.data.data ? mapTestBookingFromApi(res.data.data) : undefined,
     };
+  },
+
+  updateBloodTestTracking: async (
+    bookingId: string,
+    testItemId: string,
+    payload: UpdateBloodTestTrackingPayload,
+  ): Promise<ApiResponse<TestBooking>> => {
+    const res = await apiClient.patch<ApiResponse<BackendTestBooking>>(
+      `/test-bookings/${bookingId}/tests/${testItemId}/tracking`,
+      payload,
+    );
+    return {
+      ...res.data,
+      data: res.data.data ? mapTestBookingFromApi(res.data.data) : undefined,
+    };
+  },
+
+  uploadBloodTestReport: async (
+    bookingId: string,
+    testItemId: string,
+    payload: UploadBloodTestReportPayload,
+  ): Promise<ApiResponse<TestBooking>> => {
+    const res = await apiClient.post<ApiResponse<BackendTestBooking>>(
+      `/test-bookings/${bookingId}/tests/${testItemId}/report`,
+      payload,
+    );
+    return {
+      ...res.data,
+      data: res.data.data ? mapTestBookingFromApi(res.data.data) : undefined,
+    };
+  },
+
+  downloadBloodTestReport: async (
+    bookingId: string,
+    testItemId: string,
+  ): Promise<Blob> => {
+    const res = await apiClient.get(
+      `/test-bookings/${bookingId}/tests/${testItemId}/report`,
+      { responseType: 'blob' },
+    );
+    return res.data;
   },
 };

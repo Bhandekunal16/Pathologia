@@ -42,4 +42,9 @@ export interface ITestBookingRepository {
   findAll(filter: TestBookingListFilter): Promise<PaginatedResult<TestBookingDocument>>;
   update(id: string, data: UpdateTestBookingData): Promise<TestBookingDocument | null>;
   updateStatus(id: string, status: BookingStatus): Promise<TestBookingDocument | null>;
+  updateTestItem(
+    bookingId: string,
+    testItemId: string,
+    fields: Record<string, unknown>,
+  ): Promise<TestBookingDocument | null>;
 }
