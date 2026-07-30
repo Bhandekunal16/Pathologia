@@ -61,64 +61,50 @@ export class AuditService {
     const limit = Math.min(Math.max(filter.limit ?? 10, 1), 100);
     const skip = (page - 1) * limit;
 
-    const matchStage: Record<string, unknown> = {};
-    if (filter.action) {
-      matchStage.action = filter.action;
+    const match: Record<string, unknown> = {};
+
+    if (filter.action) match.action = filter.action;
+
+    if (filter.search) {
+      const escaped = filter.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escaped, 'i');
+      match.$or = [{ entity: regex }, { entityId: regex }, { action: regex }];
     }
 
     const pipeline: PipelineStage[] = [
-      { $match: matchStage },
+      { $match: match },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
       {
         $lookup: {
           from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
+          let: { userId: '$userId' },
+          pipeline: [
+            {
+              $match: { $expr: { $eq: ['$_id', '$$userId'] } },
+            },
+            { $project: { fullName: 1, email: 1 } },
+          ],
           as: 'user',
         },
       },
-      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+      {
+        $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
+      },
     ];
 
-    if (filter.search) {
-      const searchRegex = new RegExp(filter.search, 'i');
-      pipeline.push({
-        $match: {
-          $or: [
-            { 'user.fullName': searchRegex },
-            { 'user.email': searchRegex },
-            { entity: searchRegex },
-            { entityId: searchRegex },
-            { action: searchRegex },
-          ],
-        },
-      });
-    }
-
-    pipeline.push(
-      { $sort: { createdAt: -1 } },
-      {
-        $facet: {
-          items: [{ $skip: skip }, { $limit: limit }],
-          total: [{ $count: 'count' }],
-        },
-      },
-    );
-
-    const [result] = await this.auditLogModel.aggregate<{
-      items: PopulatedAuditLog[];
-      total: Array<{ count: number }>;
-    }>(pipeline);
-
-    const total = result?.total[0]?.count ?? 0;
+    const [items, total] = await Promise.all([
+      this.auditLogModel.aggregate<PopulatedAuditLog>(pipeline).exec(),
+      this.auditLogModel.countDocuments(match).exec(),
+    ]);
 
     return {
-      items: (result?.items ?? []).map((log) =>
-        AuditLogResponseDto.fromDocument(log),
-      ),
+      items: items.map((item) => AuditLogResponseDto.fromDocument(item)),
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit) || 1,
+      totalPages: Math.max(Math.ceil(total / limit), 1),
     };
   }
 
