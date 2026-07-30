@@ -37,15 +37,22 @@ export class AuditService {
     private readonly auditLogModel: Model<AuditLogDocument>,
   ) {}
 
-  async log(data: CreateAuditLogData): Promise<void> {
-    await this.auditLogModel.create({
-      userId: data.userId ? new Types.ObjectId(data.userId) : undefined,
+  public log(data: CreateAuditLogData): void {
+    const document = {
       action: data.action,
       entity: data.entity,
       entityId: data.entityId,
       metadata: data.metadata,
       hostname: data.hostname,
       userAgent: data.userAgent,
+      ...(data.userId &&
+        Types.ObjectId.isValid(data.userId) && {
+          userId: new Types.ObjectId(data.userId),
+        }),
+    };
+
+    void this.auditLogModel.create(document).catch((error) => {
+      console.error('Failed to create audit log', error);
     });
   }
 
@@ -105,7 +112,9 @@ export class AuditService {
     const total = result?.total[0]?.count ?? 0;
 
     return {
-      items: (result?.items ?? []).map((log) => AuditLogResponseDto.fromDocument(log)),
+      items: (result?.items ?? []).map((log) =>
+        AuditLogResponseDto.fromDocument(log),
+      ),
       total,
       page,
       limit,
