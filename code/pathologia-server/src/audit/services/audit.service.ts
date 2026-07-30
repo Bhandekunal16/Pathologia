@@ -56,7 +56,7 @@ export class AuditService {
     });
   }
 
-  async findAll(filter: AuditLogFilter) {
+  public async findAll(filter: AuditLogFilter) {
     const page = Math.max(filter.page ?? 1, 1);
     const limit = Math.min(Math.max(filter.limit ?? 10, 1), 100);
     const skip = (page - 1) * limit;
@@ -108,7 +108,7 @@ export class AuditService {
     };
   }
 
-  async findRecent(limit = 5): Promise<AuditLogResponseDto[]> {
+  public async findRecent(limit = 5): Promise<AuditLogResponseDto[]> {
     const safeLimit = Math.min(Math.max(limit, 1), 20);
     const fields = {
       action: 1,
@@ -136,27 +136,30 @@ export class AuditService {
     return logs.map((log) => AuditLogResponseDto.fromDocument(log));
   }
 
-  async findById(id: string) {
+  public async findById(id: string): Promise<AuditLogResponseDto> {
     if (!Types.ObjectId.isValid(id)) {
       throw new NotFoundException('Audit log not found');
     }
 
-    const [log] = await this.auditLogModel.aggregate<PopulatedAuditLog>([
-      { $match: { _id: new Types.ObjectId(id) } },
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user',
-        },
-      },
-      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
-    ]);
+    const fields = {
+      action: 1,
+      entity: 1,
+      entityId: 1,
+      metadata: 1,
+      hostname: 1,
+      userAgent: 1,
+      createdAt: 1,
+      userFullName: 1,
+      userEmail: 1,
+    };
 
-    if (!log) {
-      throw new NotFoundException('Audit log not found');
-    }
+    const log = await this.auditLogModel
+      .findById(id)
+      .select(fields)
+      .lean()
+      .exec();
+
+    if (!log) throw new NotFoundException('Audit log not found');
 
     return AuditLogResponseDto.fromDocument(log);
   }
