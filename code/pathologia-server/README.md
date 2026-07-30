@@ -28,10 +28,12 @@ npm install
 ### 2. Configure environment
 
 ```bash
-cp .env.example .env
+cp env.json.example env.json
 ```
 
-Update `.env` with your secrets (especially `JWT_SECRET` and `JWT_REFRESH_SECRET`).
+Update `env.json` with your secrets (especially `JWT_SECRET` and `JWT_REFRESH_SECRET`).
+
+For Vercel deployment, commit `env.json` to the project root or add the same keys as Vercel environment variables (Vercel vars take precedence over `env.json`).
 
 ### 3. Start MongoDB
 
@@ -49,7 +51,7 @@ Or use a local MongoDB instance.
 npm run seed
 ```
 
-Requires `ADMIN_EMAIL`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` in `.env`.
+Requires `ADMIN_EMAIL`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` in `env.json`.
 
 ### 5. Run the application
 
@@ -68,9 +70,13 @@ Swagger docs: `http://localhost:3000/api/docs`
 ## Docker (full stack)
 
 ```bash
-cp .env.example .env
+cp env.json.example env.json
 docker compose up --build
 ```
+
+## Vercel
+
+Deploy from `code/pathologia-server` with zero-config NestJS support. Configuration is loaded from `env.json` at startup; Vercel environment variables override values from the file when both are set.
 
 ## API Overview
 

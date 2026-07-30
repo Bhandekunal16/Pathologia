@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Stethoscope,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSidebarStore } from '../../store/sidebarStore';
@@ -31,6 +32,12 @@ export const Sidebar: React.FC = () => {
       label: 'Users Management',
       path: '/users',
       icon: Users,
+      roles: ['ADMIN'],
+    },
+    {
+      label: 'Request & Response',
+      path: '/request-response',
+      icon: ArrowLeftRight,
       roles: ['ADMIN'],
     },
     {

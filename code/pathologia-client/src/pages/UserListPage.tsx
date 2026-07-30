@@ -119,9 +119,9 @@ export const UserListPage: React.FC = () => {
               >
                 {u.fullName}
               </Link>
-              <div className="text-[11px] text-slate-500 font-normal">
-                {u.department || 'General Pathology'}
-              </div>
+              {u.department && (
+                <div className="text-[11px] text-slate-500 font-normal">{u.department}</div>
+              )}
             </div>
           </div>
         );

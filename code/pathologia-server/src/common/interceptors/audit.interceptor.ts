@@ -11,6 +11,7 @@ import { AUDIT_KEY } from '../../config/constants';
 import { AuditMetadata } from '../interfaces/audit-metadata.interface';
 import { AuditService } from '../../audit/services/audit.service';
 import { AuthenticatedUser } from '../interfaces/jwt-payload.interface';
+import { sanitizeAuditPayload } from '../utils/sanitize-audit.util';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
@@ -48,14 +49,27 @@ export class AuditInterceptor implements NestInterceptor {
           ((responseData as { _id?: string; id?: string })?._id as string) ??
           ((responseData as { _id?: string; id?: string })?.id as string);
 
+        const requestBody =
+          request.body && Object.keys(request.body as object).length > 0
+            ? sanitizeAuditPayload(request.body)
+            : undefined;
+
         await this.auditService.log({
           userId,
           action: auditMetadata.action,
           entity: auditMetadata.entity,
           entityId,
           metadata: {
-            method: request.method,
-            path: request.path,
+            request: {
+              method: request.method,
+              path: request.path,
+              ...(requestBody ? { body: requestBody } : {}),
+            },
+            response: {
+              success: true,
+              entityId,
+              data: sanitizeAuditPayload(responseData),
+            },
           },
           ipAddress: request.ip,
           userAgent: request.headers['user-agent'],

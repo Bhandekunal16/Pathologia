@@ -12,6 +12,9 @@ const UserListPage = lazy(() => import('../pages/UserListPage').then((m) => ({ d
 const CreateUserPage = lazy(() => import('../pages/CreateUserPage').then((m) => ({ default: m.CreateUserPage })));
 const EditUserPage = lazy(() => import('../pages/EditUserPage').then((m) => ({ default: m.EditUserPage })));
 const ViewUserPage = lazy(() => import('../pages/ViewUserPage').then((m) => ({ default: m.ViewUserPage })));
+const RequestResponsePage = lazy(() =>
+  import('../pages/RequestResponsePage').then((m) => ({ default: m.RequestResponsePage }))
+);
 const ProfilePage = lazy(() => import('../pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 const ForbiddenPage = lazy(() => import('../pages/ForbiddenPage').then((m) => ({ default: m.ForbiddenPage })));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
@@ -96,6 +99,14 @@ export const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<SuspenseFallback />}>
                     <EditUserPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: 'request-response',
+                element: (
+                  <Suspense fallback={<SuspenseFallback />}>
+                    <RequestResponsePage />
                   </Suspense>
                 ),
               },

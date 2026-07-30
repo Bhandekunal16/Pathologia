@@ -4,8 +4,8 @@ services:
     container_name: pathologia-api
     ports:
       - '3000:3000'
-    env_file:
-      - .env
+    volumes:
+      - ./env.json:/app/env.json:ro
     depends_on:
       - mongo
     restart: unless-stopped

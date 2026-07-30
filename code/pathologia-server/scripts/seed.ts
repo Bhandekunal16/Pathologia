@@ -1,3 +1,4 @@
+import '../src/config/load-env';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';

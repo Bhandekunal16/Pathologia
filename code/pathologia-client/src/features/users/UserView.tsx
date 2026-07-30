@@ -13,6 +13,10 @@ interface UserViewProps {
 }
 
 export const UserView: React.FC<UserViewProps> = ({ user, onEdit, onBack }) => {
+  const showDepartment =
+    user.role === 'ADMIN' || (user.role === 'PATHOLOGIST' && Boolean(user.department));
+  const showSpecialization = user.role === 'PATHOLOGIST' && Boolean(user.specialization);
+
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
       {/* Header Banner */}
@@ -67,25 +71,25 @@ export const UserView: React.FC<UserViewProps> = ({ user, onEdit, onBack }) => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-50/70 border border-slate-100">
-            <Building className="w-5 h-5 text-teal-600 shrink-0" />
-            <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase">Department</div>
-              <div className="text-xs font-medium text-slate-800">
-                {user.department || 'General Pathology'}
+          {showDepartment && (
+            <div className="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-50/70 border border-slate-100">
+              <Building className="w-5 h-5 text-teal-600 shrink-0" />
+              <div>
+                <div className="text-[11px] font-semibold text-slate-400 uppercase">Department</div>
+                <div className="text-xs font-medium text-slate-800">{user.department}</div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-50/70 border border-slate-100">
-            <Award className="w-5 h-5 text-teal-600 shrink-0" />
-            <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase">Specialization</div>
-              <div className="text-xs font-medium text-slate-800">
-                {user.specialization || 'Clinical Diagnostics'}
+          {showSpecialization && (
+            <div className="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-50/70 border border-slate-100">
+              <Award className="w-5 h-5 text-teal-600 shrink-0" />
+              <div>
+                <div className="text-[11px] font-semibold text-slate-400 uppercase">Specialization</div>
+                <div className="text-xs font-medium text-slate-800">{user.specialization}</div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-center space-x-3 p-3.5 rounded-xl bg-slate-50/70 border border-slate-100">
             <Clock className="w-5 h-5 text-teal-600 shrink-0" />

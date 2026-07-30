@@ -49,8 +49,8 @@ export const UserForm: React.FC<UserFormProps> = ({
       password: '',
       role: (initialData?.role as UserRole) || 'PATHOLOGIST',
       status: (initialData?.status as UserStatus) || 'ACTIVE',
-      department: initialData?.department || 'Anatomic Pathology',
-      specialization: initialData?.specialization || 'General Surgical Pathology',
+      department: initialData?.department || '',
+      specialization: initialData?.specialization || '',
     },
   });
 

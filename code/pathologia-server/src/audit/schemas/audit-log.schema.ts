@@ -29,6 +29,8 @@ export class AuditLog {
 
   @Prop()
   userAgent?: string;
+
+  createdAt: Date;
 }
 
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);

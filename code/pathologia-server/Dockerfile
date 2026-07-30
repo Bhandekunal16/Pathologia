@@ -18,6 +18,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
+COPY env.json ./env.json
 
 EXPOSE 3000
 

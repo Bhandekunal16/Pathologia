@@ -4,7 +4,9 @@
 
 # env
 .env
-.env.local
+.env.*
+env.json
+!env.json.example
 
 # logs
 logs
@@ -23,3 +25,4 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+.vercel

@@ -1,4 +1,6 @@
 import apiClient from './axios';
+import { auditApi } from './audit.api';
+import { mapAuditLogToRecentActivity } from '../utils/auditMapper';
 import { ApiResponse, PaginatedData, UserStatus } from '../types/common.types';
 import { User } from '../types/auth.types';
 import {
@@ -99,10 +101,11 @@ export const usersApi = {
   },
 
   getDashboardStats: async (): Promise<ApiResponse<DashboardStats>> => {
-    const [totalUsers, activeUsers, inactiveUsers] = await Promise.all([
+    const [totalUsers, activeUsers, inactiveUsers, recentAuditRes] = await Promise.all([
       fetchUserCount(),
       fetchUserCount('ACTIVE'),
       fetchUserCount('INACTIVE'),
+      auditApi.getRecentAuditLogs(5),
     ]);
 
     return {
@@ -112,7 +115,7 @@ export const usersApi = {
         totalUsers,
         activeUsers,
         inactiveUsers,
-        recentActivities: [],
+        recentActivities: (recentAuditRes.data ?? []).map(mapAuditLogToRecentActivity),
       },
     };
   },

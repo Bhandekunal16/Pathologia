@@ -35,8 +35,8 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       fullName: user.fullName || '',
       email: user.email || '',
       username: user.username || '',
-      department: isAdmin ? ADMIN_DEPARTMENT : user.department || 'Anatomic Pathology',
-      specialization: user.specialization || 'General Surgical Pathology',
+      department: isAdmin ? ADMIN_DEPARTMENT : user.department || '',
+      specialization: user.specialization || '',
     },
   });
 

@@ -161,7 +161,18 @@ export class UsersService {
       action,
       entity: 'User',
       entityId: id,
-      metadata: { status: dto.status },
+      metadata: {
+        request: {
+          method: 'PATCH',
+          path: `/users/${id}/status`,
+          body: { status: dto.status },
+        },
+        response: {
+          success: true,
+          entityId: id,
+          data: { status: dto.status },
+        },
+      },
       ipAddress: auditContext?.ipAddress,
       userAgent: auditContext?.userAgent,
     });

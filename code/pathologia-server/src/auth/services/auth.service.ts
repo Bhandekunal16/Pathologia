@@ -53,6 +53,16 @@ export class AuthService {
       action: AuditAction.LOGIN,
       entity: 'User',
       entityId: user._id.toString(),
+      metadata: {
+        request: {
+          method: request?.method ?? 'POST',
+          path: request?.path ?? '/auth/login',
+        },
+        response: {
+          success: true,
+          entityId: user._id.toString(),
+        },
+      },
       ipAddress: request?.ip,
       userAgent: request?.headers['user-agent'],
     });
@@ -71,6 +81,16 @@ export class AuthService {
       action: AuditAction.LOGOUT,
       entity: 'User',
       entityId: userId,
+      metadata: {
+        request: {
+          method: request?.method ?? 'POST',
+          path: request?.path ?? '/auth/logout',
+        },
+        response: {
+          success: true,
+          entityId: userId,
+        },
+      },
       ipAddress: request?.ip,
       userAgent: request?.headers['user-agent'],
     });
