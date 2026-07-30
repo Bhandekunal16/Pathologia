@@ -149,9 +149,7 @@ export class AuditService {
     };
   }
 
-  private mapToResponseDtos(
-    logs: PopulatedAuditLog[],
-  ): AuditLogResponseDto[] {
+  private mapToResponseDtos(logs: PopulatedAuditLog[]): AuditLogResponseDto[] {
     return logs.map((log) => AuditLogResponseDto.fromDocument(log));
   }
 }
