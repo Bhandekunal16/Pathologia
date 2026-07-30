@@ -92,7 +92,7 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Container */}
       <aside
         className={cn(
-          'fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r border-slate-200 bg-slate-900 text-slate-300 transition-all duration-300 ease-in-out lg:static',
+          'fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r border-slate-200 bg-slate-900 text-slate-300 transition-all duration-300 ease-in-out',
           isCollapsed ? 'w-20' : 'w-64',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}

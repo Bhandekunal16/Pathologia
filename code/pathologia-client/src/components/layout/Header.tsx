@@ -41,7 +41,7 @@ export const Header: React.FC = () => {
   const AccessIcon = headerConfig.icon;
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-6 shadow-2xs">
+    <header className="z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-6 shadow-2xs">
       <div className="flex items-center space-x-3">
         <button
           type="button"
