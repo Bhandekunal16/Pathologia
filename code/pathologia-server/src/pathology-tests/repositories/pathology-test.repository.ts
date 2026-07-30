@@ -36,6 +36,10 @@ export class PathologyTestRepository implements IPathologyTestRepository {
     return this.pathologyTestModel.findOne({ code: code.toUpperCase() }).exec();
   }
 
+  async findByIds(ids: string[]): Promise<PathologyTestDocument[]> {
+    return this.pathologyTestModel.find({ _id: { $in: ids } }).exec();
+  }
+
   async findAll(
     filter: PathologyTestListFilter,
   ): Promise<PaginatedResult<PathologyTestDocument>> {

@@ -13,6 +13,10 @@ const ACTION_LABELS: Record<AuditLog['action'], string> = {
   USER_DEACTIVATE: 'User account deactivated',
   USER_INVITE: 'User invitation sent',
   USER_REGISTER: 'User self-registered via invite',
+  TEST_BOOKING_CREATE: 'Test booking created',
+  TEST_BOOKING_UPDATE: 'Test booking updated',
+  TEST_BOOKING_CANCEL: 'Test booking cancelled',
+  TEST_BOOKING_OTP_SEND: 'Booking OTP sent to patient',
 };
 
 const ACTION_TYPES: Record<AuditLog['action'], RecentActivity['type']> = {
@@ -27,6 +31,10 @@ const ACTION_TYPES: Record<AuditLog['action'], RecentActivity['type']> = {
   USER_DEACTIVATE: 'user_management',
   USER_INVITE: 'user_management',
   USER_REGISTER: 'user_management',
+  TEST_BOOKING_CREATE: 'user_management',
+  TEST_BOOKING_UPDATE: 'user_management',
+  TEST_BOOKING_CANCEL: 'user_management',
+  TEST_BOOKING_OTP_SEND: 'security',
 };
 
 export function formatAuditAction(action: AuditLog['action']): string {

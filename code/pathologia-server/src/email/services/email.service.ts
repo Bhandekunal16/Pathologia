@@ -60,6 +60,8 @@ export class EmailService {
       'temporary-password',
       'deactivated',
       'invite',
+      'booking-otp',
+      'booking-confirmation',
     ];
 
     for (const name of templateFiles) {
@@ -96,7 +98,7 @@ export class EmailService {
     }
   }
 
-  private render(templateName: string, context: Record<string, string>): string {
+  private render(templateName: string, context: Record<string, string | undefined>): string {
     const template = this.templates.get(templateName);
     if (!template) {
       this.logger.error(`Email template "${templateName}" is not loaded`);
@@ -165,5 +167,52 @@ export class EmailService {
       'You are invited to join Pathologia',
       html,
     );
+  }
+
+  async sendBookingOtpEmail(params: {
+    email: string;
+    patientName: string;
+    pathologistName: string;
+    otp: string;
+    expiresAt: Date;
+  }): Promise<void> {
+    const html = this.render('booking-otp', {
+      patientName: params.patientName,
+      pathologistName: params.pathologistName,
+      otp: params.otp,
+      expiresAt: params.expiresAt.toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }),
+    });
+    await this.sendMail(params.email, 'Pathologia booking verification OTP', html);
+  }
+
+  async sendBookingConfirmationEmail(params: {
+    email: string;
+    patientName: string;
+    bookedByName: string;
+    scheduledAt: Date;
+    tests: { name: string; code: string; rate: number }[];
+    totalAmount: number;
+  }): Promise<void> {
+    const testsHtml = params.tests
+      .map(
+        (test) =>
+          `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;">${test.name} (${test.code})</td><td style="padding:8px 12px;border-bottom:1px solid #e5e7eb;text-align:right;">₹${test.rate}</td></tr>`,
+      )
+      .join('');
+
+    const html = this.render('booking-confirmation', {
+      patientName: params.patientName,
+      bookedByName: params.bookedByName,
+      scheduledAt: params.scheduledAt.toLocaleString('en-IN', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }),
+      testsHtml,
+      totalAmount: `₹${params.totalAmount}`,
+    });
+    await this.sendMail(params.email, 'Your Pathologia test booking is confirmed', html);
   }
 }

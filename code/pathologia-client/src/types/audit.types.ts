@@ -9,7 +9,11 @@ export type AuditAction =
   | 'USER_ACTIVATE'
   | 'USER_DEACTIVATE'
   | 'USER_INVITE'
-  | 'USER_REGISTER';
+  | 'USER_REGISTER'
+  | 'TEST_BOOKING_CREATE'
+  | 'TEST_BOOKING_UPDATE'
+  | 'TEST_BOOKING_CANCEL'
+  | 'TEST_BOOKING_OTP_SEND';
 
 export interface AuditLog {
   id: string;

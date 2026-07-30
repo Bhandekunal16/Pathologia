@@ -26,6 +26,10 @@ const ACTION_OPTIONS = [
   { value: 'USER_DEACTIVATE', label: 'User Deactivate' },
   { value: 'USER_INVITE', label: 'User Invite' },
   { value: 'USER_REGISTER', label: 'User Register' },
+  { value: 'TEST_BOOKING_CREATE', label: 'Test Booking Create' },
+  { value: 'TEST_BOOKING_UPDATE', label: 'Test Booking Update' },
+  { value: 'TEST_BOOKING_CANCEL', label: 'Test Booking Cancel' },
+  { value: 'TEST_BOOKING_OTP_SEND', label: 'Test Booking OTP Send' },
 ];
 
 export const RequestResponsePage: React.FC = () => {

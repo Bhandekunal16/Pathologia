@@ -12,6 +12,7 @@ import {
   ArrowLeftRight,
   FlaskConical,
   UserPlus,
+  CalendarCheck,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useSidebarStore } from '../../store/sidebarStore';
@@ -41,6 +42,12 @@ export const Sidebar: React.FC = () => {
       path: '/pathology-tests',
       icon: FlaskConical,
       roles: ['ADMIN', 'PATHOLOGIST', 'USER'],
+    },
+    {
+      label: 'Test Booking',
+      path: '/test-booking',
+      icon: CalendarCheck,
+      roles: ['PATHOLOGIST', 'USER'],
     },
     {
       label: 'Invite User',

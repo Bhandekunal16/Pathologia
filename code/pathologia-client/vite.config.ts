@@ -27,6 +27,22 @@ export default defineConfig(({ mode }) => {
           target: apiTarget,
           changeOrigin: true,
         },
+        '/pathology-tests': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
+        '/test-bookings': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
+        '/invites': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
+        '/audit-logs': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
       },
     },
   };
