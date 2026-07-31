@@ -48,11 +48,7 @@ export class AuditLogPipelineBuilder {
         from: USERS_COLLECTION,
         let: { userId: '$userId' },
         pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ['$_id', '$$userId'] },
-            },
-          },
+          { $match: { $expr: { $eq: ['$_id', '$$userId'] } } },
           { $project: USER_PROJECTION },
         ],
         as: 'user',
