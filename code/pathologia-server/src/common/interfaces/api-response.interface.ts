@@ -1,11 +1,11 @@
 export interface ApiSuccessResponse<T = unknown> {
-  success: true;
-  message: string;
-  data: T;
+  readonly success: true;
+  readonly message: string;
+  readonly data: T;
 }
 
 export interface ApiErrorResponse {
-  success: false;
-  message: string;
-  errors: string[];
+  readonly success: false;
+  readonly message: string;
+  readonly errors: string[];
 }
