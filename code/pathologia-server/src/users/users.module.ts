@@ -4,6 +4,7 @@ import { AuditModule } from '../audit/audit.module';
 import { EmailModule } from '../email/email.module';
 import { UsersController } from './controllers/users.controller';
 import { UserRepository } from './repositories/user.repository';
+import { USER_REPOSITORY } from './repositories/user.repository.interface';
 import { User, UserSchema } from './schemas/user.schema';
 import { UsersService } from './services/users.service';
 
@@ -14,7 +15,14 @@ import { UsersService } from './services/users.service';
     AuditModule,
   ],
   controllers: [UsersController],
-  providers: [UsersService, UserRepository],
-  exports: [UsersService, UserRepository],
+  providers: [
+    UsersService,
+    UserRepository,
+    {
+      provide: USER_REPOSITORY,
+      useExisting: UserRepository,
+    },
+  ],
+  exports: [UsersService, UserRepository, USER_REPOSITORY],
 })
 export class UsersModule {}

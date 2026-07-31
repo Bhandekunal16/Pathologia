@@ -2,7 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { UserRepository } from '../../users/repositories/user.repository';
+import { IUserRepository } from '../../users/repositories/user.repository.interface';
 import { AuditService } from '../../audit/services/audit.service';
 import { Status } from '../../shared/enums/status.enum';
 import { Role } from '../../shared/enums/role.enum';
@@ -13,7 +13,7 @@ jest.mock('../../common/utils/hash.util');
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let userRepository: jest.Mocked<UserRepository>;
+  let userRepository: jest.Mocked<IUserRepository>;
   let jwtService: jest.Mocked<JwtService>;
   let auditService: jest.Mocked<AuditService>;
 
@@ -42,7 +42,7 @@ describe('AuthService', () => {
       findByIdWithSecrets: jest.fn(),
       updateLastLogin: jest.fn(),
       setRefreshTokenHash: jest.fn(),
-    } as unknown as jest.Mocked<UserRepository>;
+    } as unknown as jest.Mocked<IUserRepository>;
 
     jwtService = {
       signAsync: jest.fn(),
@@ -53,15 +53,21 @@ describe('AuthService', () => {
       log: jest.fn(),
     } as unknown as jest.Mocked<AuditService>;
 
+    const configValues: Record<string, string> = {
+      'jwt.secret': 'access-secret',
+      'jwt.expiresIn': '15m',
+      'jwt.refreshSecret': 'refresh-secret',
+      'jwt.refreshExpiresIn': '7d',
+    };
+
     const configService = {
-      get: jest.fn((key: string) => {
-        const map: Record<string, string> = {
-          'jwt.secret': 'access-secret',
-          'jwt.expiresIn': '15m',
-          'jwt.refreshSecret': 'refresh-secret',
-          'jwt.refreshExpiresIn': '7d',
-        };
-        return map[key];
+      get: jest.fn((key: string) => configValues[key]),
+      getOrThrow: jest.fn((key: string) => {
+        const value = configValues[key];
+        if (!value) {
+          throw new Error(`Missing config: ${key}`);
+        }
+        return value;
       }),
     } as unknown as ConfigService;
 
