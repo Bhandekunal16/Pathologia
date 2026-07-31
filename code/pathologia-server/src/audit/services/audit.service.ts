@@ -68,8 +68,11 @@ export class AuditService {
     limit = DEFAULT_RECENT_LIMIT,
   ): Promise<readonly AuditLogResponseDto[]> {
     const safeLimit = this.clampRecentLimit(limit);
-    const result = await this.findAll({ page: DEFAULT_PAGE, limit: safeLimit });
-    return result.items;
+    const { items } = await this.findAll({
+      page: DEFAULT_PAGE,
+      limit: safeLimit,
+    });
+    return items;
   }
 
   public async findById(id: string): Promise<AuditLogResponseDto> {
