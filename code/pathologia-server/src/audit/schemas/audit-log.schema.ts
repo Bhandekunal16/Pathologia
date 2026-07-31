@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, IndexDefinition, Types } from 'mongoose';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
 
 export type AuditLogDocument = HydratedDocument<AuditLog>;
@@ -35,6 +35,10 @@ export class AuditLog {
 
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
 
-AuditLogSchema.index({ userId: 1 });
-AuditLogSchema.index({ action: 1 });
-AuditLogSchema.index({ createdAt: -1 });
+const indexes: IndexDefinition[] = [
+  { userId: 1 },
+  { action: 1 },
+  { createdAt: -1 },
+];
+
+indexes.forEach((index) => AuditLogSchema.index(index));
