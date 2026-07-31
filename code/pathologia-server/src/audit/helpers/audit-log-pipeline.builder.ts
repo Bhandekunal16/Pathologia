@@ -13,8 +13,9 @@ const REGEX_ESCAPE_PATTERN = /[.*+?^${}()|[\]\\]/g;
 export class AuditLogPipelineBuilder {
   static buildMatchFilter(filter: AuditLogFilter): Record<string, unknown> {
     const match: Record<string, unknown> = {};
-    if (filter.action) match.action = filter.action;
-    const searchFilter = this.buildSearchFilter(filter.search);
+    const { action, search } = filter;
+    if (action) match.action = action;
+    const searchFilter = this.buildSearchFilter(search);
     if (searchFilter) Object.assign(match, searchFilter);
     return match;
   }

@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
@@ -25,10 +22,7 @@ export class AuthService {
     private readonly auditService: AuditService,
   ) {}
 
-  async login(
-    dto: LoginDto,
-    request?: Request,
-  ): Promise<AuthResponseDto> {
+  async login(dto: LoginDto, request?: Request): Promise<AuthResponseDto> {
     const user = await this.userRepository.findByEmailOrUsername(
       dto.identifier,
     );
@@ -101,9 +95,12 @@ export class AuthService {
     let payload: AuthJwtPayload;
 
     try {
-      payload = await this.jwtService.verifyAsync<AuthJwtPayload>(refreshToken, {
-        secret: this.configService.get<string>('jwt.refreshSecret'),
-      });
+      payload = await this.jwtService.verifyAsync<AuthJwtPayload>(
+        refreshToken,
+        {
+          secret: this.configService.get<string>('jwt.refreshSecret'),
+        },
+      );
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -152,7 +149,9 @@ export class AuthService {
     },
     request?: Request,
   ): Promise<AuthResponseDto> {
-    const userDocument = await this.userRepository.findById(user._id.toString());
+    const userDocument = await this.userRepository.findById(
+      user._id.toString(),
+    );
     if (!userDocument || userDocument.status !== Status.ACTIVE) {
       throw new UnauthorizedException('User account is not active');
     }
@@ -200,7 +199,8 @@ export class AuthService {
 
     const accessSecret = this.configService.get<string>('jwt.secret');
     const refreshSecret = this.configService.get<string>('jwt.refreshSecret');
-    const accessExpiresIn = this.configService.get<string>('jwt.expiresIn') ?? '15m';
+    const accessExpiresIn =
+      this.configService.get<string>('jwt.expiresIn') ?? '15m';
     const refreshExpiresIn =
       this.configService.get<string>('jwt.refreshExpiresIn') ?? '7d';
 
