@@ -73,9 +73,8 @@ export class AuditService {
   }
 
   public async findById(id: string): Promise<AuditLogResponseDto> {
-    if (!Types.ObjectId.isValid(id)) {
+    if (!Types.ObjectId.isValid(id))
       throw new NotFoundException('Audit log not found');
-    }
 
     const pipeline = AuditLogPipelineBuilder.buildDetailPipeline(
       new Types.ObjectId(id),
@@ -84,10 +83,7 @@ export class AuditService {
       .aggregate<AuditLogRecord>(pipeline)
       .exec();
 
-    if (!log) {
-      throw new NotFoundException('Audit log not found');
-    }
-
+    if (!log) throw new NotFoundException('Audit log not found');
     return mapAuditLogRecordToResponseDto(log);
   }
 
@@ -124,12 +120,8 @@ export class AuditService {
       Math.max(filter.limit ?? DEFAULT_LIMIT, 1),
       MAX_LIMIT,
     );
-
-    return {
-      page,
-      limit,
-      skip: (page - 1) * limit,
-    };
+    const skip = (page - 1) * limit;
+    return { page, limit, skip };
   }
 
   private clampRecentLimit(limit: number): number {
@@ -142,14 +134,9 @@ export class AuditService {
   ): PaginatedAuditLogResult {
     const items = this.mapToResponseDtos(facetResult?.items ?? []);
     const total = facetResult?.total[0]?.count ?? 0;
-
-    return {
-      items,
-      total,
-      page: pagination.page,
-      limit: pagination.limit,
-      totalPages: Math.max(Math.ceil(total / pagination.limit), 1),
-    };
+    const { page, limit } = pagination;
+    const totalPages = Math.max(Math.ceil(total / limit), 1);
+    return { items, total, page, limit, totalPages };
   }
 
   private mapToResponseDtos(
