@@ -12,6 +12,10 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
 import { Role } from '../../shared/enums/role.enum';
 import { AuditService } from '../services/audit.service';
+import {
+  AuditLogResponseDto,
+  PaginatedAuditLogsResponseDto,
+} from '../dto/audit-log-response.dto';
 
 @ApiTags('Audit Logs')
 @ApiBearerAuth()
@@ -30,6 +34,7 @@ export class AuditController {
   @ApiResponse({
     status: 200,
     description: 'Audit logs retrieved successfully',
+    type: PaginatedAuditLogsResponseDto,
   })
   findAll(
     @Query('page') page?: number,
@@ -46,6 +51,8 @@ export class AuditController {
   @ApiResponse({
     status: 200,
     description: 'Recent audit logs retrieved successfully',
+    type: AuditLogResponseDto,
+    isArray: true,
   })
   findRecent(@Query('limit') limit?: number) {
     return this.auditService.findRecent(limit);
@@ -56,6 +63,7 @@ export class AuditController {
   @ApiResponse({
     status: 200,
     description: 'Audit log retrieved successfully',
+    type: AuditLogResponseDto,
   })
   @ApiResponse({
     status: 404,

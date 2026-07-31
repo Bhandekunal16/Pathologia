@@ -1,50 +1,57 @@
 import { Types } from 'mongoose';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
-import { AuditLogResponseDto } from '../dto/audit-log-response.dto';
-import { AuditLogDocument } from '../schemas/audit-log.schema';
 
 export interface CreateAuditLogData {
-  userId?: string;
-  action: AuditAction;
-  entity: string;
-  entityId?: string;
-  metadata?: Record<string, unknown>;
-  hostname?: string;
-  userAgent?: string;
+  readonly userId?: string;
+  readonly action: AuditAction;
+  readonly entity: string;
+  readonly entityId?: string;
+  readonly metadata?: Record<string, unknown>;
+  readonly hostname?: string;
+  readonly userAgent?: string;
 }
 
 export interface AuditLogFilter {
-  page?: number;
-  limit?: number;
-  search?: string;
-  action?: AuditAction;
+  readonly page?: number;
+  readonly limit?: number;
+  readonly search?: string;
+  readonly action?: AuditAction;
 }
 
 export interface PaginationParams {
-  page: number;
-  limit: number;
-  skip: number;
+  readonly page: number;
+  readonly limit: number;
+  readonly skip: number;
 }
 
-export interface PaginatedAuditLogResult {
-  items: AuditLogResponseDto[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+export interface PaginatedResult<T> {
+  readonly items: readonly T[];
+  readonly total: number;
+  readonly page: number;
+  readonly limit: number;
+  readonly totalPages: number;
 }
 
-export interface PopulatedAuditUser {
-  _id: Types.ObjectId;
-  fullName: string;
-  email: string;
+export interface PopulatedAuditUserRecord {
+  readonly _id: Types.ObjectId;
+  readonly fullName: string;
+  readonly email: string;
 }
 
-export interface PopulatedAuditLog extends AuditLogDocument {
-  user?: PopulatedAuditUser;
+export interface AuditLogRecord {
+  readonly _id: Types.ObjectId;
+  readonly userId?: Types.ObjectId;
+  readonly user?: PopulatedAuditUserRecord;
+  readonly action: AuditAction;
+  readonly entity: string;
+  readonly entityId?: string;
+  readonly metadata?: Record<string, unknown>;
+  readonly hostname?: string;
+  readonly userAgent?: string;
+  readonly createdAt: Date;
 }
 
 export interface AuditLogFacetAggregation {
-  items: PopulatedAuditLog[];
-  total: Array<{ count: number }>;
+  readonly items: AuditLogRecord[];
+  readonly total: ReadonlyArray<{ readonly count: number }>;
 }

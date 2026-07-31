@@ -11,6 +11,7 @@
     "createdAt": 1
   },
   "USER_PROJECTION": {
+    "_id": 1,
     "fullName": 1,
     "email": 1
   },

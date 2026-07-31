@@ -10,21 +10,24 @@ import {
 } from '../constants/audit-log.constants';
 import { AuditLogResponseDto } from '../dto/audit-log-response.dto';
 import { AuditLogPipelineBuilder } from '../helpers/audit-log-pipeline.builder';
+import { mapAuditLogRecordToResponseDto } from '../helpers/audit-log-response.mapper';
 import {
   AuditLogFacetAggregation,
   AuditLogFilter,
+  AuditLogRecord,
   CreateAuditLogData,
-  PaginatedAuditLogResult,
   PaginationParams,
-  PopulatedAuditLog,
+  PaginatedResult,
 } from '../interfaces/audit-log.interfaces';
 import { AuditLog, AuditLogDocument } from '../schemas/audit-log.schema';
 
 export type {
   AuditLogFilter,
   CreateAuditLogData,
-  PaginatedAuditLogResult,
+  PaginatedResult,
 } from '../interfaces/audit-log.interfaces';
+
+export type PaginatedAuditLogResult = PaginatedResult<AuditLogResponseDto>;
 
 @Injectable()
 export class AuditService {
@@ -63,7 +66,7 @@ export class AuditService {
 
   public async findRecent(
     limit = DEFAULT_RECENT_LIMIT,
-  ): Promise<AuditLogResponseDto[]> {
+  ): Promise<readonly AuditLogResponseDto[]> {
     const safeLimit = this.clampRecentLimit(limit);
     const result = await this.findAll({ page: DEFAULT_PAGE, limit: safeLimit });
     return result.items;
@@ -78,14 +81,14 @@ export class AuditService {
       new Types.ObjectId(id),
     );
     const [log] = await this.auditLogModel
-      .aggregate<PopulatedAuditLog>(pipeline)
+      .aggregate<AuditLogRecord>(pipeline)
       .exec();
 
     if (!log) {
       throw new NotFoundException('Audit log not found');
     }
 
-    return AuditLogResponseDto.fromDocument(log);
+    return mapAuditLogRecordToResponseDto(log);
   }
 
   private buildCreateDocument(
@@ -149,7 +152,9 @@ export class AuditService {
     };
   }
 
-  private mapToResponseDtos(logs: PopulatedAuditLog[]): AuditLogResponseDto[] {
-    return logs.map((log) => AuditLogResponseDto.fromDocument(log));
+  private mapToResponseDtos(
+    logs: readonly AuditLogRecord[],
+  ): AuditLogResponseDto[] {
+    return logs.map((log) => mapAuditLogRecordToResponseDto(log));
   }
 }

@@ -1,99 +1,76 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
-import { AuditLogDocument } from '../schemas/audit-log.schema';
-
-interface PopulatedAuditUser {
-  _id: { toString(): string };
-  fullName: string;
-  email: string;
-}
-
-interface AuditLogSource {
-  _id: { toString(): string };
-  userId?: { toString(): string };
-  user?: PopulatedAuditUser;
-  action: AuditAction;
-  entity: string;
-  entityId?: string;
-  metadata?: Record<string, unknown>;
-  hostname?: string;
-  ipAddress?: string;
-  userAgent?: string;
-  createdAt: Date;
-}
 
 export class AuditLogResponseDto {
-  @ApiProperty()
-  @Expose()
-  @Transform(({ obj }: { obj: AuditLogDocument }) => obj._id.toString())
-  id: string;
+  @ApiProperty({ description: 'Audit log identifier' })
+  readonly id: string;
 
-  @ApiPropertyOptional()
-  @Expose()
-  @Transform(
-    ({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
-      obj.userId?.toString(),
-  )
-  userId?: string;
+  @ApiPropertyOptional({ description: 'Acting user identifier' })
+  readonly userId?: string;
 
-  @ApiPropertyOptional()
-  @Expose()
-  @Transform(
-    ({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
-      obj.user?.fullName,
-  )
-  userName?: string;
+  @ApiPropertyOptional({ description: 'Acting user full name when populated' })
+  readonly userName?: string;
 
-  @ApiPropertyOptional()
-  @Expose()
-  @Transform(
-    ({ obj }: { obj: AuditLogDocument & { user?: PopulatedAuditUser } }) =>
-      obj.user?.email,
-  )
-  userEmail?: string;
+  @ApiPropertyOptional({ description: 'Acting user email when populated' })
+  readonly userEmail?: string;
 
   @ApiProperty({ enum: AuditAction })
-  @Expose()
-  action: AuditAction;
+  readonly action: AuditAction;
 
   @ApiProperty()
-  @Expose()
-  entity: string;
+  readonly entity: string;
 
   @ApiPropertyOptional()
-  @Expose()
-  entityId?: string;
+  readonly entityId?: string;
 
-  @ApiPropertyOptional()
-  @Expose()
-  metadata?: Record<string, unknown>;
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  readonly metadata?: Record<string, unknown>;
 
   @ApiPropertyOptional({ example: 'localhost' })
-  @Expose()
-  hostname?: string;
+  readonly hostname?: string;
 
   @ApiPropertyOptional()
-  @Expose()
-  userAgent?: string;
+  readonly userAgent?: string;
 
   @ApiProperty()
-  @Expose()
-  createdAt: Date;
+  readonly createdAt: Date;
 
-  static fromDocument(log: AuditLogSource): AuditLogResponseDto {
-    const dto = new AuditLogResponseDto();
-    dto.id = log._id.toString();
-    dto.userId = log.userId?.toString();
-    dto.userName = log.user?.fullName;
-    dto.userEmail = log.user?.email;
-    dto.action = log.action;
-    dto.entity = log.entity;
-    dto.entityId = log.entityId;
-    dto.metadata = log.metadata;
-    dto.hostname = log.hostname ?? log.ipAddress;
-    dto.userAgent = log.userAgent;
-    dto.createdAt = log.createdAt;
-    return dto;
+  constructor(props: AuditLogResponseDto) {
+    this.id = props.id;
+    this.userId = props.userId;
+    this.userName = props.userName;
+    this.userEmail = props.userEmail;
+    this.action = props.action;
+    this.entity = props.entity;
+    this.entityId = props.entityId;
+    this.metadata = props.metadata;
+    this.hostname = props.hostname;
+    this.userAgent = props.userAgent;
+    this.createdAt = props.createdAt;
+  }
+}
+
+export class PaginatedAuditLogsResponseDto {
+  @ApiProperty({ type: [AuditLogResponseDto] })
+  readonly items: AuditLogResponseDto[];
+
+  @ApiProperty()
+  readonly total: number;
+
+  @ApiProperty()
+  readonly page: number;
+
+  @ApiProperty()
+  readonly limit: number;
+
+  @ApiProperty()
+  readonly totalPages: number;
+
+  constructor(props: PaginatedAuditLogsResponseDto) {
+    this.items = props.items;
+    this.total = props.total;
+    this.page = props.page;
+    this.limit = props.limit;
+    this.totalPages = props.totalPages;
   }
 }
