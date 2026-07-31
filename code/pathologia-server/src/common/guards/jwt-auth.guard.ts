@@ -1,8 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from '../../config/constants';
-import { JWT_ACCESS_STRATEGY } from '../../config/constants';
+import { IS_PUBLIC_KEY, JWT_ACCESS_STRATEGY } from '../../config/constants';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard(JWT_ACCESS_STRATEGY) {
@@ -10,16 +9,12 @@ export class JwtAuthGuard extends AuthGuard(JWT_ACCESS_STRATEGY) {
     super();
   }
 
-  canActivate(context: ExecutionContext) {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    if (isPublic) {
-      return true;
-    }
-
-    return super.canActivate(context);
+  override canActivate(context: ExecutionContext) {
+    return (
+      this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? super.canActivate(context)
+    );
   }
 }
