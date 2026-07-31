@@ -56,31 +56,20 @@ export class AuthService {
       dto.identifier,
     );
 
-    if (!user) {
-      this.rejectInvalidCredentials();
-    }
+    if (!user) this.rejectInvalidCredentials();
 
-    if (user.status !== Status.ACTIVE) {
+    if (user.status !== Status.ACTIVE)
       throw new UnauthorizedException(AUTH_ERRORS.ACCOUNT_INACTIVE);
-    }
 
-    if (!(await compareHash(dto.password, user.password))) {
+    if (!(await compareHash(dto.password, user.password)))
       this.rejectInvalidCredentials();
-    }
 
-    return this.completeLogin(user, {
-      request,
-      defaultPath: '/auth/login',
-    });
+    return this.completeLogin(user, { request, defaultPath: '/auth/login' });
   }
 
   public async logout(userId: string, request?: Request): Promise<void> {
     await this.userRepository.setRefreshTokenHash(userId, null);
-
-    this.auditLogout(userId, {
-      request,
-      defaultPath: '/auth/logout',
-    });
+    this.auditLogout(userId, { request, defaultPath: '/auth/logout' });
   }
 
   public async refresh(refreshToken: string): Promise<AuthResponseDto> {
@@ -89,33 +78,23 @@ export class AuthService {
       .catch(() => {
         this.rejectInvalidRefreshToken();
       });
-
     const user = await this.userRepository.findByIdWithSecrets(sub);
 
-    if (!user || user.status !== Status.ACTIVE) {
+    if (!user || user.status !== Status.ACTIVE)
       this.rejectInvalidRefreshToken();
-    }
 
-    if (!user.refreshTokenHash) {
-      this.rejectInvalidRefreshToken();
-    }
+    if (!user.refreshTokenHash) this.rejectInvalidRefreshToken();
 
-    if (!(await compareHash(refreshToken, user.refreshTokenHash))) {
+    if (!(await compareHash(refreshToken, user.refreshTokenHash)))
       this.rejectInvalidRefreshToken();
-    }
 
     const tokens = await this.issueTokens(user);
-
     return { ...tokens, user: UserResponseDto.fromDocument(user) };
   }
 
   public async getMe(userId: string): Promise<UserResponseDto> {
     const user = await this.userRepository.findById(userId);
-
-    if (!user) {
-      throw new UnauthorizedException(AUTH_ERRORS.USER_NOT_FOUND);
-    }
-
+    if (!user) throw new UnauthorizedException(AUTH_ERRORS.USER_NOT_FOUND);
     return UserResponseDto.fromDocument(user);
   }
 
@@ -127,9 +106,8 @@ export class AuthService {
       sourceUser._id.toString(),
     );
 
-    if (!userDocument || userDocument.status !== Status.ACTIVE) {
+    if (!userDocument || userDocument.status !== Status.ACTIVE)
       throw new UnauthorizedException(AUTH_ERRORS.USER_NOT_ACTIVE);
-    }
 
     return this.completeLogin(userDocument, {
       request,
