@@ -3,6 +3,7 @@ import { gunzipSync, gzipSync } from 'zlib';
 
 const BYTES_PER_MB = 1024 * 1024;
 const DEFAULT_MAX_REPORT_SIZE_BYTES = 5 * BYTES_PER_MB;
+export const MAX_REPORT_SIZE_BYTES = resolveMaxReportSizeBytes();
 
 function resolveMaxReportSizeBytes(): number {
   const raw = process.env.MAX_REPORT_SIZE_BYTES;
@@ -13,8 +14,6 @@ function resolveMaxReportSizeBytes(): number {
     ? parsed
     : DEFAULT_MAX_REPORT_SIZE_BYTES;
 }
-
-export const MAX_REPORT_SIZE_BYTES = resolveMaxReportSizeBytes();
 
 function formatMaxReportSizeMb(): string {
   return `${MAX_REPORT_SIZE_BYTES / BYTES_PER_MB}MB`;
