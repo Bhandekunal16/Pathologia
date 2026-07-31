@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { Button } from '../components/ui/Button';
 import { useAuth } from '../hooks/useAuth';
 import { useTestBookings } from '../hooks/useTestBookings';
 import {
@@ -74,19 +76,19 @@ export const BloodTestTrackingPage: React.FC = () => {
             : 'Track your blood test progress and download reports when available.'
         }
         action={
-          <div className="inline-flex items-center gap-2 bg-teal-50 border border-teal-200 text-teal-800 px-3.5 py-1.5 rounded-xl text-xs font-semibold">
-            <Activity className="w-4 h-4" />
-            Live Tracking
+          <div className="header-chip">
+            <Activity className="w-4 h-4 header-chip-icon" />
+            <span>Live Tracking</span>
           </div>
         }
       />
 
       {isLoadingBookings ? (
-        <p className="text-sm text-slate-500">Loading blood tests...</p>
+        <LoadingSpinner size="md" label="Loading blood tests..." />
       ) : bloodTestEntries.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <p className="text-sm font-semibold text-slate-800">No blood test bookings found</p>
-          <p className="text-xs text-slate-500 mt-1">
+        <div className="rounded-xl border border-border bg-surface p-8 text-center">
+          <p className="text-sm font-semibold text-foreground">No blood test bookings found</p>
+          <p className="text-xs text-foreground-muted mt-1">
             Confirmed bookings with blood tests will appear here.
           </p>
         </div>
@@ -97,15 +99,16 @@ export const BloodTestTrackingPage: React.FC = () => {
             const isExpanded = expandedKey === key;
 
             return (
-              <div key={key} className="rounded-xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
+              <div key={key} className="rounded-xl border border-border bg-surface shadow-card overflow-hidden">
                 <button
                   type="button"
                   onClick={() => setExpandedKey(isExpanded ? null : key)}
-                  className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center justify-between gap-4 px-5 py-4 min-h-14 text-left hover:bg-surface-sunken transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset focus-ring"
+                  aria-expanded={isExpanded}
                 >
                   <div>
-                    <p className="text-sm font-bold text-slate-900">{test.name}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-sm font-bold text-foreground">{test.name}</p>
+                    <p className="text-xs text-foreground-muted mt-0.5">
                       {booking.patientName ?? 'Patient'} · {formatDate(booking.scheduledAt)}
                     </p>
                   </div>
@@ -113,8 +116,8 @@ export const BloodTestTrackingPage: React.FC = () => {
                     className={cn(
                       'text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0',
                       test.trackingStatus
-                        ? 'bg-teal-50 text-teal-700'
-                        : 'bg-slate-100 text-slate-500',
+                        ? 'bg-accent-subtle text-accent'
+                        : 'bg-surface-sunken text-foreground-muted',
                     )}
                   >
                     {test.trackingStatus?.replace(/_/g, ' ') ?? 'Not started'}
@@ -122,7 +125,7 @@ export const BloodTestTrackingPage: React.FC = () => {
                 </button>
 
                 {isExpanded && (
-                  <div className="px-5 pb-5 border-t border-slate-100">
+                  <div className="px-5 pb-5 border-t border-border-subtle">
                     <BloodTestTrackingPanel
                       booking={booking}
                       test={test}
@@ -145,26 +148,28 @@ export const BloodTestTrackingPage: React.FC = () => {
       )}
 
       {(bookingsData?.totalPages ?? 1) > 1 && (
-        <div className="flex justify-center gap-2">
-          <button
+        <div className="flex justify-center items-center gap-3">
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1.5 rounded-lg border text-xs disabled:opacity-50"
           >
             Previous
-          </button>
-          <span className="text-xs text-slate-500 self-center">
+          </Button>
+          <span className="text-xs text-foreground-muted">
             Page {page} of {bookingsData?.totalPages ?? 1}
           </span>
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="sm"
             disabled={page >= (bookingsData?.totalPages ?? 1)}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1.5 rounded-lg border text-xs disabled:opacity-50"
           >
             Next
-          </button>
+          </Button>
         </div>
       )}
     </div>

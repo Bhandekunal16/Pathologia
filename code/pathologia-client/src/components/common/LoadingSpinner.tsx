@@ -22,12 +22,12 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     <div className="flex flex-col items-center justify-center p-4">
       <div
         className={cn(
-          'rounded-full border-teal-200 border-t-teal-700 animate-spin',
+          'rounded-full border-accent-muted border-t-accent animate-spin',
           sizeMap[size],
           className
         )}
       />
-      {label && <span className="mt-2 text-xs font-medium text-slate-500">{label}</span>}
+      {label && <span className="mt-2 text-xs font-medium text-foreground-muted">{label}</span>}
     </div>
   );
 };

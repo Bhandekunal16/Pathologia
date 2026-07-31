@@ -1,0 +1,116 @@
+/* ─── Green-focused theme palettes (aligned with Pathologia logo #0f766e) ─── */
+
+:root,
+[data-palette='teal'] {
+  --palette-50: #f0fdfa;
+  --palette-100: #ccfbf1;
+  --palette-200: #99f6e4;
+  --palette-300: #5eead4;
+  --palette-400: #2dd4bf;
+  --palette-500: #14b8a6;
+  --palette-600: #0d9488;
+  --palette-700: #0f766e;
+  --palette-800: #115e59;
+  --palette-900: #134e4a;
+  --palette-950: #042f2e;
+  --color-brand-primary: #0f766e;
+  --color-brand-secondary: #14b8a6;
+  --color-brand-highlight: #5eead4;
+}
+
+[data-palette='emerald'] {
+  --palette-50: #ecfdf5;
+  --palette-100: #d1fae5;
+  --palette-200: #a7f3d0;
+  --palette-300: #6ee7b7;
+  --palette-400: #34d399;
+  --palette-500: #10b981;
+  --palette-600: #059669;
+  --palette-700: #047857;
+  --palette-800: #065f46;
+  --palette-900: #064e3b;
+  --palette-950: #022c22;
+  --color-brand-primary: #047857;
+  --color-brand-secondary: #10b981;
+  --color-brand-highlight: #6ee7b7;
+}
+
+[data-palette='mint'] {
+  --palette-50: #f0fdf4;
+  --palette-100: #dcfce7;
+  --palette-200: #bbf7d0;
+  --palette-300: #86efac;
+  --palette-400: #4ade80;
+  --palette-500: #22c55e;
+  --palette-600: #16a34a;
+  --palette-700: #15803d;
+  --palette-800: #166534;
+  --palette-900: #14532d;
+  --palette-950: #052e16;
+  --color-brand-primary: #15803d;
+  --color-brand-secondary: #22c55e;
+  --color-brand-highlight: #86efac;
+}
+
+[data-palette='forest'] {
+  --palette-50: #f0fdf4;
+  --palette-100: #dcfce7;
+  --palette-200: #bbf7d0;
+  --palette-300: #86efac;
+  --palette-400: #4ade80;
+  --palette-500: #22c55e;
+  --palette-600: #16a34a;
+  --palette-700: #14532d;
+  --palette-800: #166534;
+  --palette-900: #14532d;
+  --palette-950: #052e16;
+  --color-brand-primary: #14532d;
+  --color-brand-secondary: #22c55e;
+  --color-brand-highlight: #86efac;
+}
+
+[data-palette='sage'] {
+  --palette-50: #f7fee7;
+  --palette-100: #ecfccb;
+  --palette-200: #d9f99d;
+  --palette-300: #bef264;
+  --palette-400: #a3e635;
+  --palette-500: #84cc16;
+  --palette-600: #65a30d;
+  --palette-700: #4d7c0f;
+  --palette-800: #3f6212;
+  --palette-900: #365314;
+  --palette-950: #1a2e05;
+  --color-brand-primary: #4d7c0f;
+  --color-brand-secondary: #84cc16;
+  --color-brand-highlight: #bef264;
+}
+
+[data-palette='pine'] {
+  --palette-50: #f0fdfa;
+  --palette-100: #ccfbf1;
+  --palette-200: #99f6e4;
+  --palette-300: #5eead4;
+  --palette-400: #2dd4bf;
+  --palette-500: #14b8a6;
+  --palette-600: #0d9488;
+  --palette-700: #0f5c4a;
+  --palette-800: #115e59;
+  --palette-900: #134e4a;
+  --palette-950: #042f2e;
+  --color-brand-primary: #0f5c4a;
+  --color-brand-secondary: #14b8a6;
+  --color-brand-highlight: #5eead4;
+}
+
+/* Dark mode — stable glass buttons per palette */
+.dark {
+  --color-button-accent: var(--palette-700);
+  --color-button-glass-fill: color-mix(in srgb, var(--color-button-accent) 72%, transparent);
+  --color-button-glass-fill-hover: color-mix(in srgb, var(--color-button-accent) 82%, transparent);
+  --color-button-glass-fill-active: color-mix(in srgb, var(--color-button-accent) 88%, transparent);
+  --color-button-glass-shadow: color-mix(in srgb, var(--color-button-accent) 28%, transparent);
+  --color-button-glass-shadow-hover: color-mix(in srgb, var(--color-button-accent) 34%, transparent);
+  --color-button-glass-shadow-active: color-mix(in srgb, var(--color-button-accent) 22%, transparent);
+  --color-button-glass-shadow-sm: color-mix(in srgb, var(--color-button-accent) 24%, transparent);
+}

@@ -26,7 +26,7 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ stats, isLoading
         title="Total Users"
         value={stats?.totalUsers || 0}
         subtitle="Registered system accounts"
-        icon={<Users className="w-5 h-5 text-teal-600" />}
+        icon={<Users className="w-5 h-5 text-accent" />}
         trend={{ value: '+12% this month', isPositive: true }}
         color="teal"
       />
@@ -35,7 +35,7 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ stats, isLoading
         title="Active Users"
         value={stats?.activeUsers || 0}
         subtitle="Currently active pathologists & staff"
-        icon={<UserCheck className="w-5 h-5 text-emerald-600" />}
+        icon={<UserCheck className="w-5 h-5 text-success" />}
         trend={{ value: '100% operational', isPositive: true }}
         color="emerald"
       />
@@ -44,7 +44,7 @@ export const DashboardCards: React.FC<DashboardCardsProps> = ({ stats, isLoading
         title="Inactive Users"
         value={stats?.inactiveUsers || 0}
         subtitle="Suspended or deactivated accounts"
-        icon={<UserX className="w-5 h-5 text-rose-600" />}
+        icon={<UserX className="w-5 h-5 text-danger" />}
         color="rose"
       />
     </div>

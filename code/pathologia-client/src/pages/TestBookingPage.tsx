@@ -9,16 +9,21 @@ import {
   Pencil,
   Plus,
   Send,
-  ShoppingCart,
   Trash2,
   X,
 } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
 import { SearchInput } from '../components/common/SearchInput';
+import { DropdownMenu } from '../components/common/DropdownMenu';
 import { DataTable } from '../components/table/DataTable';
 import { Input } from '../components/forms/Input';
+import { IconButton } from '../components/ui/IconButton';
+import { Button } from '../components/ui/Button';
+import { WizardFooter } from '../components/common/WizardFooter';
 import { BookingDetailModal } from '../features/test-booking/BookingDetailModal';
 import { BookingEditModal } from '../features/test-booking/BookingEditModal';
+import { BookingStepper } from '../features/test-booking/BookingStepper';
+import { BookingCartSummary } from '../features/test-booking/BookingCartSummary';
 import { useAuth } from '../hooks/useAuth';
 import { usePathologyTests } from '../hooks/usePathologyTests';
 import { useTestBookings } from '../hooks/useTestBookings';
@@ -129,15 +134,12 @@ export const TestBookingPage: React.FC = () => {
         cell: ({ row }) => {
           const inCart = hasItem(row.original.id);
           return (
-            <button
+            <Button
               type="button"
+              size="sm"
+              variant={inCart ? 'danger' : 'primary'}
               onClick={() => (inCart ? removeItem(row.original.id) : addItem(row.original))}
-              className={cn(
-                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors',
-                inCart
-                  ? 'bg-rose-50 text-rose-700 hover:bg-rose-100'
-                  : 'bg-teal-50 text-teal-700 hover:bg-teal-100',
-              )}
+              className={inCart ? '' : undefined}
             >
               {inCart ? (
                 <>
@@ -150,7 +152,7 @@ export const TestBookingPage: React.FC = () => {
                   Add
                 </>
               )}
-            </button>
+            </Button>
           );
         },
       },
@@ -182,34 +184,30 @@ export const TestBookingPage: React.FC = () => {
         cell: ({ row }) => formatDate(row.original.scheduledAt),
       },
       {
-        id: 'patient',
-        header: 'Patient',
-        cell: ({ row }) => row.original.patientName ?? '—',
+        id: 'summary',
+        header: 'Booking',
+        cell: ({ row }) => {
+          const booking = row.original;
+          return (
+            <div>
+              <div className="text-xs font-semibold text-foreground">
+                {booking.tests.length} test(s)
+                {booking.patientName ? ` · ${booking.patientName}` : ''}
+              </div>
+              {isPathologist && (
+                <div className="text-xs text-foreground-muted mt-0.5">
+                  {booking.patientUserId === booking.bookedByUserId
+                    ? 'User (self)'
+                    : booking.bookedByName ?? '—'}
+                </div>
+              )}
+            </div>
+          );
+        },
       },
     ];
 
-    if (isPathologist) {
-      columns.push({
-        id: 'bookedBy',
-        header: 'Booked By',
-        cell: ({ row }) => {
-          const isSelfBooking =
-            row.original.patientUserId === row.original.bookedByUserId;
-          return isSelfBooking ? (
-            <span className="text-emerald-700 font-medium">User (self)</span>
-          ) : (
-            row.original.bookedByName ?? '—'
-          );
-        },
-      });
-    }
-
     columns.push(
-      {
-        id: 'tests',
-        header: 'Tests',
-        cell: ({ row }) => `${row.original.tests.length} test(s)`,
-      },
       {
         accessorKey: 'totalAmount',
         header: 'Total',
@@ -223,8 +221,8 @@ export const TestBookingPage: React.FC = () => {
             className={cn(
               'inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold',
               row.original.status === 'CONFIRMED'
-                ? 'bg-emerald-50 text-emerald-700'
-                : 'bg-rose-50 text-rose-700',
+                ? 'bg-success-muted text-success'
+                : 'bg-danger-muted text-danger',
             )}
           >
             {row.original.status === 'CONFIRMED' ? 'Confirmed' : 'Cancelled'}
@@ -234,38 +232,46 @@ export const TestBookingPage: React.FC = () => {
       {
         id: 'actions',
         header: '',
-        cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => openBookingDetail(row.original)}
-              className="p-1.5 rounded-lg text-slate-500 hover:text-teal-700 hover:bg-teal-50 transition-colors"
-              title="View booking details"
-            >
-              <Eye className="w-4 h-4" />
-            </button>
-            {canEditBooking(row.original) && (
-              <button
-                type="button"
-                onClick={() => openBookingEdit(row.original)}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-amber-700 hover:bg-amber-50 transition-colors"
-                title="Edit tests and timeline"
+        cell: ({ row }) => {
+          const booking = row.original;
+          const editable = canEditBooking(booking);
+          const menuItems = [
+            ...(editable
+              ? [
+                  {
+                    id: 'edit',
+                    label: 'Edit booking',
+                    icon: <Pencil className="w-4 h-4" />,
+                    onClick: () => openBookingEdit(booking),
+                  },
+                  {
+                    id: 'cancel',
+                    label: 'Cancel booking',
+                    icon: <X className="w-4 h-4" />,
+                    variant: 'danger' as const,
+                    disabled: isCancellingBooking,
+                    onClick: () => cancelBooking(booking.id),
+                  },
+                ]
+              : []),
+          ];
+
+          return (
+            <div className="flex items-center justify-end gap-1">
+              <IconButton
+                variant="teal"
+                title="View booking details"
+                aria-label="View booking details"
+                onClick={() => openBookingDetail(booking)}
               >
-                <Pencil className="w-4 h-4" />
-              </button>
-            )}
-            {canEditBooking(row.original) ? (
-              <button
-                type="button"
-                disabled={isCancellingBooking}
-                onClick={() => cancelBooking(row.original.id)}
-                className="text-xs font-semibold text-rose-600 hover:text-rose-700"
-              >
-                Cancel
-              </button>
-            ) : null}
-          </div>
-        ),
+                <Eye className="w-4 h-4" />
+              </IconButton>
+              {menuItems.length > 0 && (
+                <DropdownMenu items={menuItems} triggerLabel="Booking actions" />
+              )}
+            </div>
+          );
+        },
       },
     );
 
@@ -317,13 +323,13 @@ export const TestBookingPage: React.FC = () => {
             : 'Select pathology tests, add them to your cart, and schedule an appointment.'
         }
         action={
-          <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1">
+          <div className="inline-flex rounded-xl border border-border bg-surface p-1">
             <button
               type="button"
               onClick={() => setActiveTab('book')}
               className={cn(
                 'px-4 py-2 rounded-lg text-xs font-semibold transition-colors',
-                activeTab === 'book' ? 'bg-teal-600 text-white' : 'text-slate-600 hover:bg-slate-50',
+                activeTab === 'book' ? 'accent-glass rounded-lg' : 'text-foreground-muted hover:bg-surface-sunken',
               )}
             >
               Book Tests
@@ -334,8 +340,8 @@ export const TestBookingPage: React.FC = () => {
               className={cn(
                 'px-4 py-2 rounded-lg text-xs font-semibold transition-colors',
                 activeTab === 'bookings'
-                  ? 'bg-teal-600 text-white'
-                  : 'text-slate-600 hover:bg-slate-50',
+                  ? 'accent-glass rounded-lg'
+                  : 'text-foreground-muted hover:bg-surface-sunken',
               )}
             >
               {isPathologist ? 'Patient Bookings' : 'My Bookings'}
@@ -347,7 +353,7 @@ export const TestBookingPage: React.FC = () => {
       {activeTab === 'book' ? (
         <div className="space-y-6">
           {isPathologist && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+            <div className="bg-surface rounded-xl border border-border p-5 shadow-card">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -358,11 +364,11 @@ export const TestBookingPage: React.FC = () => {
                     setOtp('');
                     setVerifiedPatientName('');
                   }}
-                  className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                  className="rounded border-border text-accent focus-ring"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Book on behalf of a patient</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-sm font-semibold text-foreground">Book on behalf of a patient</p>
+                  <p className="text-xs text-foreground-muted">
                     An OTP will be sent to the patient&apos;s registered email for authorization.
                   </p>
                 </div>
@@ -380,21 +386,21 @@ export const TestBookingPage: React.FC = () => {
                       setOtpSent(false);
                       setOtp('');
                     }}
-                    leftIcon={<Mail className="w-4 h-4 text-slate-400" />}
+                    leftIcon={<Mail className="w-4 h-4 text-foreground-subtle" />}
                   />
                   <div className="flex items-end">
                     <button
                       type="button"
                       onClick={handleSendOtp}
                       disabled={!patientEmail || isSendingOtp}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold disabled:opacity-50"
+                      className="sidebar-action-btn"
                     >
                       <Send className="w-4 h-4" />
                       {isSendingOtp ? 'Sending...' : 'Send OTP'}
                     </button>
                   </div>
                   {otpSent && (
-                    <div className="md:col-span-2 rounded-xl border border-teal-200 bg-teal-50/60 p-3 text-xs text-teal-800">
+                    <div className="md:col-span-2 rounded-xl border border-accent-muted bg-accent-subtle/60 p-3 text-xs text-accent">
                       OTP sent to <strong>{patientEmail}</strong>
                       {verifiedPatientName ? ` for ${verifiedPatientName}` : ''}. Enter it on the confirm step.
                     </div>
@@ -404,37 +410,17 @@ export const TestBookingPage: React.FC = () => {
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-2">
-            {STEPS.map((s, index) => (
-              <React.Fragment key={s.id}>
-                <button
-                  type="button"
-                  onClick={() => setStep(s.id)}
-                  className={cn(
-                    'inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-colors',
-                    step === s.id
-                      ? 'bg-teal-600 text-white'
-                      : index <= stepIndex
-                        ? 'bg-teal-50 text-teal-700'
-                        : 'bg-slate-100 text-slate-500',
-                  )}
-                >
-                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]">
-                    {index + 1}
-                  </span>
-                  {s.label}
-                </button>
-                {index < STEPS.length - 1 && <div className="w-6 h-px bg-slate-200" />}
-              </React.Fragment>
-            ))}
-            <div className="ml-auto inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">
-              <ShoppingCart className="w-4 h-4" />
-              {items.length} in cart · {formatCurrency(cartTotal)}
-            </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <BookingStepper
+              steps={STEPS}
+              currentStepId={step}
+              currentStepIndex={stepIndex}
+            />
+            <BookingCartSummary itemCount={items.length} totalAmount={cartTotal} />
           </div>
 
           {step === 'tests' && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
+            <div className="bg-surface rounded-xl border border-border p-5 shadow-card space-y-4">
               <SearchInput
                 value={search}
                 onChange={setSearch}
@@ -447,81 +433,67 @@ export const TestBookingPage: React.FC = () => {
                 emptyTitle="No tests available"
                 emptyDescription="No active tests are available for booking."
               />
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setStep('cart')}
-                  disabled={!canProceedFromCart}
-                  className="px-4 py-2.5 rounded-xl bg-teal-600 text-white text-xs font-semibold disabled:opacity-50"
-                >
-                  Continue to Cart
-                </button>
-              </div>
+              <WizardFooter
+                showBack={false}
+                onPrimary={() => setStep('cart')}
+                primaryLabel="Continue to Cart"
+                primaryDisabled={!canProceedFromCart}
+              />
             </div>
           )}
 
           {step === 'cart' && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
+            <div className="bg-surface rounded-xl border border-border p-5 shadow-card space-y-4">
               {items.length === 0 ? (
-                <p className="text-sm text-slate-500">Your cart is empty. Add tests to continue.</p>
+                <p className="text-sm text-foreground-muted">Your cart is empty. Add tests to continue.</p>
               ) : (
                 <div className="space-y-3">
                   {items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-border p-4"
                     >
                       <div>
-                        <p className="text-sm font-semibold text-slate-900">{item.name}</p>
-                        <p className="text-xs text-slate-500">{item.code} · {TEST_CATEGORY_LABELS[item.category]}</p>
+                        <p className="text-sm font-semibold text-foreground">{item.name}</p>
+                        <p className="text-xs text-foreground-muted">{item.code} · {TEST_CATEGORY_LABELS[item.category]}</p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-slate-800">{formatCurrency(item.rate)}</span>
+                        <span className="text-sm font-bold text-foreground">{formatCurrency(item.rate)}</span>
                         <button
                           type="button"
                           onClick={() => removeItem(item.id)}
-                          className="p-2 rounded-lg text-rose-600 hover:bg-rose-50"
+                          className="min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg text-danger hover:bg-danger-muted transition-colors"
+                          aria-label="Remove from cart"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
                   ))}
-                  <div className="flex justify-between items-center pt-3 border-t border-slate-200">
-                    <span className="text-sm font-semibold text-slate-700">Total</span>
-                    <span className="text-lg font-bold text-teal-700">{formatCurrency(cartTotal)}</span>
+                  <div className="flex justify-between items-center pt-3 border-t border-border">
+                    <span className="text-sm font-semibold text-foreground-secondary">Total</span>
+                    <span className="text-lg font-bold text-accent">{formatCurrency(cartTotal)}</span>
                   </div>
                 </div>
               )}
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setStep('tests')}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep('schedule')}
-                  disabled={!canProceedFromCart}
-                  className="px-4 py-2.5 rounded-xl bg-teal-600 text-white text-xs font-semibold disabled:opacity-50"
-                >
-                  Choose Date & Time
-                </button>
-              </div>
+              <WizardFooter
+                onBack={() => setStep('tests')}
+                onPrimary={() => setStep('schedule')}
+                primaryLabel="Choose Date & Time"
+                primaryDisabled={!canProceedFromCart}
+              />
             </div>
           )}
 
           {step === 'schedule' && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4 max-w-xl">
+            <div className="bg-surface rounded-xl border border-border p-5 shadow-card space-y-4 max-w-xl">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-teal-50 text-teal-700">
+                <div className="p-3 rounded-xl bg-accent-subtle text-accent">
                   <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Select appointment date & time</p>
-                  <p className="text-xs text-slate-500">Choose when the patient should visit for the tests.</p>
+                  <p className="text-sm font-semibold text-foreground">Select appointment date & time</p>
+                  <p className="text-xs text-foreground-muted">Choose when the patient should visit for the tests.</p>
                 </div>
               </div>
               <Input
@@ -533,75 +505,64 @@ export const TestBookingPage: React.FC = () => {
                 required
               />
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Notes (optional)</label>
+                <label className="block text-xs font-semibold text-foreground-secondary mb-1.5">Notes (optional)</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
                   placeholder="Fasting required, special instructions..."
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                  className="w-full rounded-xl border border-border px-3 py-2 text-xs focus:outline-none focus:ring-2 focus-ring"
                 />
               </div>
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setStep('cart')}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setStep('confirm')}
-                  disabled={!canProceedFromSchedule}
-                  className="px-4 py-2.5 rounded-xl bg-teal-600 text-white text-xs font-semibold disabled:opacity-50"
-                >
-                  Review Booking
-                </button>
-              </div>
+              <WizardFooter
+                onBack={() => setStep('cart')}
+                onPrimary={() => setStep('confirm')}
+                primaryLabel="Review Booking"
+                primaryDisabled={!canProceedFromSchedule}
+              />
             </div>
           )}
 
           {step === 'confirm' && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-5 max-w-2xl">
+            <div className="bg-surface rounded-xl border border-border p-5 shadow-card space-y-5 max-w-2xl">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-teal-50 text-teal-700">
+                <div className="p-3 rounded-xl bg-accent-subtle text-accent">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">Confirm your booking</p>
-                  <p className="text-xs text-slate-500">Review details before confirming.</p>
+                  <p className="text-sm font-semibold text-foreground">Confirm your booking</p>
+                  <p className="text-xs text-foreground-muted">Review details before confirming.</p>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs space-y-2">
+              <div className="rounded-xl border border-border bg-surface-sunken p-4 text-xs space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Appointment</span>
-                  <span className="font-semibold text-slate-800">
+                  <span className="text-foreground-muted">Appointment</span>
+                  <span className="font-semibold text-foreground">
                     {scheduledAt ? formatDate(new Date(scheduledAt).toISOString()) : '—'}
                   </span>
                 </div>
                 {bookForPatient && (
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Patient</span>
-                    <span className="font-semibold text-slate-800">{patientEmail}</span>
+                    <span className="text-foreground-muted">Patient</span>
+                    <span className="font-semibold text-foreground">{patientEmail}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Tests</span>
-                  <span className="font-semibold text-slate-800">{items.length}</span>
+                  <span className="text-foreground-muted">Tests</span>
+                  <span className="font-semibold text-foreground">{items.length}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Total</span>
-                  <span className="font-bold text-teal-700">{formatCurrency(cartTotal)}</span>
+                  <span className="text-foreground-muted">Total</span>
+                  <span className="font-bold text-accent">{formatCurrency(cartTotal)}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 {items.map((item) => (
                   <div key={item.id} className="flex justify-between text-xs">
-                    <span className="text-slate-700">{item.name}</span>
-                    <span className="font-semibold text-slate-800">{formatCurrency(item.rate)}</span>
+                    <span className="text-foreground-secondary">{item.name}</span>
+                    <span className="font-semibold text-foreground">{formatCurrency(item.rate)}</span>
                   </div>
                 ))}
               </div>
@@ -617,29 +578,19 @@ export const TestBookingPage: React.FC = () => {
                 />
               )}
 
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => setStep('schedule')}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmBooking}
-                  disabled={!canConfirm || isCreatingBooking}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 text-white text-xs font-semibold disabled:opacity-50"
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  {isCreatingBooking ? 'Booking...' : 'Confirm Booking'}
-                </button>
-              </div>
+              <WizardFooter
+                onBack={() => setStep('schedule')}
+                onPrimary={handleConfirmBooking}
+                primaryLabel="Confirm Booking"
+                primaryDisabled={!canConfirm}
+                primaryLoading={isCreatingBooking}
+                primaryIcon={<CheckCircle2 className="w-4 h-4" />}
+              />
             </div>
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+        <div className="bg-surface rounded-xl border border-border p-5 shadow-card">
           <DataTable
             columns={bookingColumns}
             data={bookingsData?.items ?? []}

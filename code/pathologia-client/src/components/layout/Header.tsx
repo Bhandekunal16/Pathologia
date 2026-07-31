@@ -1,6 +1,7 @@
 import React from 'react';
-import { Menu, Activity, ShieldCheck, Stethoscope, User } from 'lucide-react';
+import { Menu, ShieldCheck, Stethoscope, User } from 'lucide-react';
 import { UserMenu } from './UserMenu';
+import { Logo } from '../common/Logo';
 import { useSidebarStore } from '../../store/sidebarStore';
 import { useAuth } from '../../hooks/useAuth';
 import { UserRole } from '../../types/common.types';
@@ -9,28 +10,24 @@ const roleHeaderConfig: Record<
   UserRole,
   {
     portalLabel: string;
-    accessLabel: string;
     icon: React.ComponentType<{ className?: string }>;
     iconClassName: string;
   }
 > = {
   ADMIN: {
-    portalLabel: 'Admin Pathology Portal',
-    accessLabel: 'Admin Level Access',
+    portalLabel: 'Admin Portal',
     icon: ShieldCheck,
-    iconClassName: 'text-purple-600',
+    iconClassName: 'text-admin',
   },
   PATHOLOGIST: {
-    portalLabel: 'Pathologist Pathology Portal',
-    accessLabel: 'Clinical Workspace Access',
+    portalLabel: 'Clinical Workspace',
     icon: Stethoscope,
-    iconClassName: 'text-teal-600',
+    iconClassName: 'text-accent',
   },
   USER: {
-    portalLabel: 'User Pathology Portal',
-    accessLabel: 'Standard User Access',
+    portalLabel: 'User Portal',
     icon: User,
-    iconClassName: 'text-slate-600',
+    iconClassName: 'text-foreground-muted',
   },
 };
 
@@ -41,36 +38,31 @@ export const Header: React.FC = () => {
   const AccessIcon = headerConfig.icon;
 
   return (
-    <header className="z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 backdrop-blur-md px-4 sm:px-6 shadow-2xs">
+    <header className="z-30 flex h-16 w-full shrink-0 items-center justify-between border-b border-border bg-surface/95 backdrop-blur-md px-4 sm:px-6 shadow-card">
       <div className="flex items-center space-x-3">
         <button
           type="button"
           onClick={toggleMobile}
-          className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden focus:outline-hidden"
+          className="rounded-lg min-h-11 min-w-11 inline-flex items-center justify-center text-foreground-muted hover:bg-surface-sunken lg:hidden focus:outline-hidden focus:ring-2 focus-ring"
           title="Open menu"
+          aria-label="Open menu"
         >
           <Menu className="w-5 h-5" />
         </button>
 
         {/* Brand logo in header for mobile / quick view */}
         <div className="flex items-center space-x-2.5 lg:hidden">
-          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-teal-600 text-white shadow-xs">
-            <Activity className="w-4 h-4" />
-          </div>
-          <span className="text-sm font-extrabold text-slate-900 tracking-tight">
-            Path<span className="text-teal-600">ologia</span>
+          <Logo size="sm" />
+          <span className="text-sm font-extrabold text-foreground tracking-tight">
+            Path<span className="text-accent">ologia</span>
           </span>
         </div>
 
         {/* Desktop Header Context Badge */}
-        <div className="hidden lg:flex items-center space-x-2 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="hidden lg:flex items-center gap-2 text-xs font-semibold text-foreground-muted bg-surface-sunken border border-border px-3 py-1.5 rounded-full">
+          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
           <span>{headerConfig.portalLabel}</span>
-          <span className="text-slate-300">|</span>
-          <span className="text-slate-500 flex items-center space-x-1">
-            <AccessIcon className={`w-3.5 h-3.5 inline ${headerConfig.iconClassName}`} />
-            <span>{headerConfig.accessLabel}</span>
-          </span>
+          <AccessIcon className={`w-3.5 h-3.5 ${headerConfig.iconClassName}`} />
         </div>
       </div>
 

@@ -16,32 +16,32 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700">
-            {label} {props.required && <span className="text-rose-500">*</span>}
+          <label htmlFor={inputId} className="block text-xs font-semibold text-foreground-secondary">
+            {label} {props.required && <span className="text-danger">*</span>}
           </label>
         )}
         <div className="relative flex items-center">
           {leftIcon && (
-            <div className="absolute left-3 text-slate-400 pointer-events-none">{leftIcon}</div>
+            <div className="absolute left-3 text-foreground-subtle pointer-events-none">{leftIcon}</div>
           )}
           <input
             id={inputId}
             ref={ref}
             className={cn(
-              'w-full py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600 disabled:bg-slate-100 disabled:cursor-not-allowed transition-all',
+              'w-full py-2 text-xs bg-surface border border-border rounded-lg text-foreground placeholder:text-foreground-subtle shadow-card focus:outline-hidden focus:ring-2 focus-ring focus:border-accent disabled:bg-surface-sunken disabled:cursor-not-allowed transition-all',
               leftIcon ? 'pl-9' : 'pl-3',
               rightIcon ? 'pr-9' : 'pr-3',
-              error ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-600' : '',
+              error ? 'border-danger focus-ring focus:border-danger' : '',
               className
             )}
             {...props}
           />
           {rightIcon && (
-            <div className="absolute right-3 text-slate-400">{rightIcon}</div>
+            <div className="absolute right-3 text-foreground-subtle">{rightIcon}</div>
           )}
         </div>
-        {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
-        {!error && helperText && <p className="text-xs text-slate-500">{helperText}</p>}
+        {error && <p className="text-xs text-danger font-medium">{error}</p>}
+        {!error && helperText && <p className="text-xs text-foreground-muted">{helperText}</p>}
       </div>
     );
   }

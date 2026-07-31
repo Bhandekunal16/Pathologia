@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { Eye, Filter, ArrowLeftRight } from 'lucide-react';
+import { Eye, ScrollText } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
-import { SearchInput } from '../components/common/SearchInput';
+import { FilterBar } from '../components/common/FilterBar';
 import { DataTable } from '../components/table/DataTable';
+import { IconButton } from '../components/ui/IconButton';
 import { AuditLogDetailModal } from '../features/audit/AuditLogDetailModal';
 import { useAuditLogs } from '../hooks/useAuditLogs';
 import { AuditLog } from '../types/audit.types';
@@ -69,7 +70,7 @@ export const RequestResponsePage: React.FC = () => {
       accessorKey: 'createdAt',
       header: 'Timestamp',
       cell: ({ row }) => (
-        <span className="text-[11px] text-slate-500">{formatDate(row.original.createdAt)}</span>
+        <span className="table-meta">{formatDate(row.original.createdAt)}</span>
       ),
     },
     {
@@ -79,11 +80,11 @@ export const RequestResponsePage: React.FC = () => {
         const log = row.original;
         return (
           <div>
-            <div className="text-xs font-semibold text-slate-800">
+            <div className="table-cell-text">
               {log.userName || 'System'}
             </div>
             {log.userEmail && (
-              <div className="text-[11px] text-slate-500">{log.userEmail}</div>
+              <div className="table-meta">{log.userEmail}</div>
             )}
           </div>
         );
@@ -93,7 +94,7 @@ export const RequestResponsePage: React.FC = () => {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }) => (
-        <span className="inline-flex whitespace-nowrap px-2 py-0.5 rounded-full text-[11px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+        <span className="badge-accent">
           {formatAuditAction(row.original.action)}
         </span>
       ),
@@ -102,30 +103,23 @@ export const RequestResponsePage: React.FC = () => {
       id: 'request',
       header: 'Request',
       cell: ({ row }) => (
-        <code className="text-[11px] text-slate-700 bg-slate-100 px-2 py-1 rounded-md">
+        <code className="table-code">
           {getAuditRequestSummary(row.original)}
         </code>
       ),
     },
     {
-      accessorKey: 'hostname',
-      header: 'Hostname',
-      cell: ({ row }) => (
-        <span className="text-[11px] text-slate-500">{row.original.hostname || 'N/A'}</span>
-      ),
-    },
-    {
       id: 'actions',
-      header: 'Details',
+      header: '',
       cell: ({ row }) => (
-        <button
-          type="button"
+        <IconButton
+          variant="teal"
+          title="View details"
+          aria-label="View audit log details"
           onClick={() => openDetail(row.original)}
-          className="inline-flex items-center space-x-1.5 px-2.5 py-1.5 text-[11px] font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-colors"
         >
-          <Eye className="w-3.5 h-3.5" />
-          <span>View</span>
-        </button>
+          <Eye className="w-4 h-4" />
+        </IconButton>
       ),
     },
   ];
@@ -133,33 +127,27 @@ export const RequestResponsePage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Request & Response Logs"
-        description="Review API request and response activity across the admin platform."
+        title="Audit Logs"
+        description="Review system activity and API request history across the admin platform."
         action={
-          <div className="inline-flex items-center space-x-2 bg-slate-50 border border-slate-200 text-slate-700 px-3.5 py-1.5 rounded-xl text-xs font-semibold shadow-2xs">
-            <ArrowLeftRight className="w-4 h-4 text-teal-600" />
-            <span>Audit Trail</span>
+          <div className="header-chip">
+            <ScrollText className="w-4 h-4 header-chip-icon" />
+            <span>Activity Trail</span>
           </div>
         }
       />
 
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-        <SearchInput
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="Search by user, action, entity..."
-        />
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filters:</span>
-          </div>
-
+      <div className="data-panel">
+        <FilterBar
+          searchValue={search}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search by user, action, entity..."
+          variant="embedded"
+        >
           <select
             value={actionFilter}
             onChange={handleActionChange}
-            className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:outline-hidden focus:ring-2 focus:ring-teal-500/20"
+            className="form-select"
           >
             {ACTION_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -167,22 +155,23 @@ export const RequestResponsePage: React.FC = () => {
               </option>
             ))}
           </select>
-        </div>
-      </div>
+        </FilterBar>
 
-      <DataTable
-        columns={columns}
-        data={auditLogsData?.items || []}
-        isLoading={isLoadingAuditLogs}
-        totalRecords={auditLogsData?.total || 0}
-        currentPage={page}
-        totalPages={auditLogsData?.totalPages || 1}
-        limit={limit}
-        onPageChange={setPage}
-        onLimitChange={setLimit}
-        emptyTitle="No request/response logs found"
-        emptyDescription="System activity will appear here as users interact with the platform."
-      />
+        <DataTable
+          columns={columns}
+          data={auditLogsData?.items || []}
+          isLoading={isLoadingAuditLogs}
+          totalRecords={auditLogsData?.total || 0}
+          currentPage={page}
+          totalPages={auditLogsData?.totalPages || 1}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
+          emptyTitle="No audit logs found"
+          emptyDescription="System activity will appear here as users interact with the platform."
+          className="data-panel-table"
+        />
+      </div>
 
       <AuditLogDetailModal
         isOpen={isDetailOpen}

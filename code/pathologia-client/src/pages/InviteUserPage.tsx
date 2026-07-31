@@ -38,10 +38,10 @@ export const InviteUserPage: React.FC = () => {
         description="Send an email invitation so the recipient can register as a standard user on Pathologia."
       />
 
-      <div className="max-w-xl bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-5">
-        <div className="flex items-start gap-3 rounded-xl border border-teal-100 bg-teal-50/60 p-4">
-          <UserPlus className="w-5 h-5 text-teal-700 shrink-0 mt-0.5" />
-          <div className="text-xs text-slate-700 leading-relaxed">
+      <div className="max-w-xl bg-surface p-6 rounded-xl border border-border shadow-card space-y-5">
+        <div className="flex items-start gap-3 rounded-xl border border-accent-muted bg-accent-subtle/60 p-4">
+          <UserPlus className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+          <div className="text-xs text-foreground-secondary leading-relaxed">
             Invited users can only register with the <strong>User</strong> role. They will receive
             an email with a secure link valid for 7 days to set up their own account.
           </div>
@@ -52,7 +52,7 @@ export const InviteUserPage: React.FC = () => {
             label="User Email Address"
             type="email"
             placeholder="e.g. user@example.com"
-            leftIcon={<Mail className="w-4 h-4 text-slate-400" />}
+            leftIcon={<Mail className="w-4 h-4 text-foreground-subtle" />}
             error={errors.email?.message}
             required
             {...register('email')}
@@ -61,7 +61,7 @@ export const InviteUserPage: React.FC = () => {
           <button
             type="submit"
             disabled={isSendingInvite}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl transition-colors disabled:opacity-50"
+            className="btn-primary"
           >
             <Send className="w-4 h-4" />
             <span>{isSendingInvite ? 'Sending Invite...' : 'Send Invitation'}</span>
@@ -69,7 +69,7 @@ export const InviteUserPage: React.FC = () => {
         </form>
 
         {lastInvitedEmail && (
-          <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2">
+          <p className="text-xs text-success bg-success-muted border border-success-border rounded-lg px-3 py-2">
             Invitation email sent to <strong>{lastInvitedEmail}</strong>.
           </p>
         )}

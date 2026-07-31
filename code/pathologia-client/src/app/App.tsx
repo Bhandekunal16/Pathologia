@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthInitializer } from '../components/auth/AuthInitializer';
+import { ThemeInitializer } from '../components/theme/ThemeInitializer';
 import { router } from './router';
 
 const queryClient = new QueryClient({
@@ -19,6 +20,7 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeInitializer />
       <AuthInitializer>
         <RouterProvider router={router} />
       </AuthInitializer>
@@ -30,20 +32,20 @@ export default function App() {
             fontSize: '12px',
             fontWeight: 600,
             borderRadius: '12px',
-            background: '#0f172a',
-            color: '#fff',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            background: 'var(--toast-bg)',
+            color: 'var(--toast-text)',
+            boxShadow: 'var(--shadow-elevated)',
           },
           success: {
             iconTheme: {
-              primary: '#0d9488',
-              secondary: '#fff',
+              primary: 'var(--toast-success)',
+              secondary: 'var(--toast-text)',
             },
           },
           error: {
             iconTheme: {
-              primary: '#e11d48',
-              secondary: '#fff',
+              primary: 'var(--toast-error)',
+              secondary: 'var(--toast-text)',
             },
           },
         }}

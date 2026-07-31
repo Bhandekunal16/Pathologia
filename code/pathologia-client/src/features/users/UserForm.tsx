@@ -55,12 +55,12 @@ export const UserForm: React.FC<UserFormProps> = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-6 rounded-xl border border-slate-200 shadow-2xs">
-      <div className="border-b border-slate-100 pb-4">
-        <h3 className="text-base font-bold text-slate-900">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-surface p-6 rounded-xl border border-border shadow-card">
+      <div className="border-b border-border-subtle pb-4">
+        <h3 className="text-base font-bold text-foreground">
           {isEdit ? 'Edit User Credentials & Role' : 'Create New User Account'}
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-foreground-muted mt-0.5">
           {isEdit
             ? 'Update user role, department, and account details'
             : 'Fill in user information to provision a new pathologist or admin account'}
@@ -141,22 +141,22 @@ export const UserForm: React.FC<UserFormProps> = ({
         />
       </div>
 
-      <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+      <div className="flex items-center justify-end space-x-3 pt-4 border-t border-border-subtle">
         <button
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 disabled:opacity-50 transition-colors"
+          className="px-4 py-2 text-xs font-semibold text-foreground-secondary bg-surface border border-border rounded-lg hover:bg-surface-sunken disabled:opacity-50 transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="px-5 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-2xs disabled:opacity-50 transition-colors flex items-center space-x-2"
+          className="btn-primary"
         >
           {isLoading && (
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="spinner-on-accent" />
           )}
           <span>{isEdit ? 'Save Changes' : 'Create User'}</span>
         </button>

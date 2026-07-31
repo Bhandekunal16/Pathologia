@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { BookOpen, Edit, Filter, IndianRupee, List, Plus } from 'lucide-react';
+import { BookOpen, Edit, List, Plus, IndianRupee } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
-import { SearchInput } from '../components/common/SearchInput';
+import { FilterBar } from '../components/common/FilterBar';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { DataTable } from '../components/table/DataTable';
 import { PathologyTestDetailModal } from '../features/pathology-tests/PathologyTestDetailModal';
@@ -18,16 +18,17 @@ import {
   TEST_CATEGORY_OPTIONS,
 } from '../types/pathology-test.types';
 import { formatCurrency } from '../utils/formatters';
+import { IconButton } from '../components/ui/IconButton';
 import { cn } from '../lib/utils';
 
 type CatalogTab = 'tests' | 'rates';
 
 const categoryBadgeStyles: Record<PathologyTest['category'], string> = {
-  BLOOD: 'bg-rose-50 text-rose-700',
-  URINE: 'bg-amber-50 text-amber-700',
-  IMAGING: 'bg-sky-50 text-sky-700',
-  BODY_CHECKUP: 'bg-teal-50 text-teal-700',
-  OTHER: 'bg-slate-100 text-slate-700',
+  BLOOD: 'badge-category-blood',
+  URINE: 'badge-category-urine',
+  IMAGING: 'badge-category-imaging',
+  BODY_CHECKUP: 'badge-category-body',
+  OTHER: 'badge-category-other',
 };
 
 export const PathologyTestListPage: React.FC = () => {
@@ -114,11 +115,11 @@ export const PathologyTestListPage: React.FC = () => {
             <button
               type="button"
               onClick={() => openDetail(test)}
-              className="font-bold text-slate-900 hover:text-teal-700 transition-colors text-left"
+              className="table-link text-left"
             >
               {test.name}
             </button>
-            <p className="text-[11px] text-slate-500 font-mono mt-0.5">{test.code}</p>
+            <p className="table-meta font-mono mt-0.5">{test.code}</p>
           </div>
         );
       },
@@ -130,10 +131,7 @@ export const PathologyTestListPage: React.FC = () => {
         const category = row.original.category;
         return (
           <span
-            className={cn(
-              'inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide',
-              categoryBadgeStyles[category],
-            )}
+            className={cn(categoryBadgeStyles[category])}
           >
             {TEST_CATEGORY_LABELS[category]}
           </span>
@@ -141,27 +139,11 @@ export const PathologyTestListPage: React.FC = () => {
       },
     },
     {
-      accessorKey: 'specimenType',
-      header: 'Specimen',
-      cell: ({ row }) => (
-        <span className="text-xs text-slate-700 font-medium">{row.original.specimenType}</span>
-      ),
-    },
-    {
       accessorKey: 'rate',
       header: 'Rate',
       cell: ({ row }) => (
-        <span className="text-xs font-bold text-slate-800">
+        <span className="table-cell-text">
           {formatCurrency(row.original.rate ?? 0)}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'description',
-      header: 'Description',
-      cell: ({ row }) => (
-        <span className="text-xs text-slate-500 line-clamp-2 max-w-xs">
-          {row.original.description || '—'}
         </span>
       ),
     },
@@ -172,28 +154,28 @@ export const PathologyTestListPage: React.FC = () => {
     },
     {
       id: 'actions',
-      header: 'Actions',
+      header: '',
       cell: ({ row }) => {
         const test = row.original;
         return (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
+          <div className="flex items-center gap-1 justify-end">
+            <IconButton
+              variant="teal"
+              title="View details"
+              aria-label="View test details"
               onClick={() => openDetail(test)}
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors"
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>View</span>
-            </button>
+              <BookOpen className="w-4 h-4" />
+            </IconButton>
             {canManageTests && (
-              <button
-                type="button"
+              <IconButton
+                variant="blue"
+                title="Edit test"
+                aria-label="Edit test"
                 onClick={() => openEditForm(test)}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
               >
-                <Edit className="w-3.5 h-3.5" />
-                <span>Edit</span>
-              </button>
+                <Edit className="w-4 h-4" />
+              </IconButton>
             )}
           </div>
         );
@@ -215,7 +197,7 @@ export const PathologyTestListPage: React.FC = () => {
             <button
               type="button"
               onClick={openCreateForm}
-              className="inline-flex items-center space-x-2 px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-xs hover:shadow-md transition-all"
+              className="btn-primary"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Test</span>
@@ -224,7 +206,7 @@ export const PathologyTestListPage: React.FC = () => {
         }
       />
 
-      <div className="flex border-b border-slate-200">
+      <div className="tab-bar">
         {[
           { id: 'tests' as const, label: 'Tests', icon: List },
           { id: 'rates' as const, label: 'Test Rates', icon: IndianRupee },
@@ -235,12 +217,7 @@ export const PathologyTestListPage: React.FC = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-colors',
-                activeTab === tab.id
-                  ? 'border-teal-600 text-teal-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-800',
-              )}
+              className={cn('tab-item', activeTab === tab.id && 'tab-item--active')}
             >
               <Icon className="w-3.5 h-3.5" />
               {tab.label}
@@ -249,23 +226,17 @@ export const PathologyTestListPage: React.FC = () => {
         })}
       </div>
 
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-        <SearchInput
-          value={search}
-          onChange={handleSearchChange}
-          placeholder="Search by test name, code, or specimen..."
-        />
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filters:</span>
-          </div>
-
+      <div className="data-panel">
+        <FilterBar
+          searchValue={search}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search by test name, code, or specimen..."
+          variant="embedded"
+        >
           <select
             value={categoryFilter}
             onChange={handleCategoryChange}
-            className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:outline-hidden focus:ring-2 focus:ring-teal-500/20"
+            className="form-select"
           >
             <option value="">All Categories</option>
             {TEST_CATEGORY_OPTIONS.map((option) => (
@@ -279,45 +250,47 @@ export const PathologyTestListPage: React.FC = () => {
             <select
               value={statusFilter}
               onChange={handleStatusChange}
-              className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:outline-hidden focus:ring-2 focus:ring-teal-500/20"
+              className="form-select"
             >
               <option value="">All Statuses</option>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
             </select>
           )}
-        </div>
-      </div>
+        </FilterBar>
 
-      {activeTab === 'tests' ? (
-        <DataTable
-          columns={columns}
-          data={testsData?.items || []}
-          isLoading={isLoadingTests}
-          totalRecords={testsData?.total || 0}
-          currentPage={page}
-          totalPages={testsData?.totalPages || 1}
-          limit={limit}
-          onPageChange={setPage}
-          onLimitChange={setLimit}
-          emptyTitle="No pathology tests found"
-          emptyDescription="Try adjusting your search or category filters."
-        />
-      ) : (
-        <PathologyTestRatesTab
-          tests={testsData?.items || []}
-          isLoading={isLoadingTests}
-          totalRecords={testsData?.total || 0}
-          currentPage={page}
-          totalPages={testsData?.totalPages || 1}
-          limit={limit}
-          onPageChange={setPage}
-          onLimitChange={setLimit}
-          canManageTests={canManageTests}
-          onSaveRate={handleSaveRate}
-          isSavingRate={isUpdatingTest}
-        />
-      )}
+        {activeTab === 'tests' ? (
+          <DataTable
+            columns={columns}
+            data={testsData?.items || []}
+            isLoading={isLoadingTests}
+            totalRecords={testsData?.total || 0}
+            currentPage={page}
+            totalPages={testsData?.totalPages || 1}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+            emptyTitle="No pathology tests found"
+            emptyDescription="Try adjusting your search or category filters."
+            className="data-panel-table"
+          />
+        ) : (
+          <PathologyTestRatesTab
+            tests={testsData?.items || []}
+            isLoading={isLoadingTests}
+            totalRecords={testsData?.total || 0}
+            currentPage={page}
+            totalPages={testsData?.totalPages || 1}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+            canManageTests={canManageTests}
+            onSaveRate={handleSaveRate}
+            isSavingRate={isUpdatingTest}
+            embedded
+          />
+        )}
+      </div>
 
       <PathologyTestDetailModal
         isOpen={isDetailOpen}

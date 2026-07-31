@@ -8,6 +8,7 @@ import {
   getSortedRowModel,
 } from '@tanstack/react-table';
 import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { cn } from '../../lib/utils';
 import { TableSkeleton } from '../common/Skeleton';
 import { EmptyState } from '../common/EmptyState';
 import { Pagination } from '../common/Pagination';
@@ -24,6 +25,7 @@ interface DataTableProps<TData, TValue> {
   onLimitChange?: (limit: number) => void;
   emptyTitle?: string;
   emptyDescription?: string;
+  className?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -38,6 +40,7 @@ export function DataTable<TData, TValue>({
   onLimitChange,
   emptyTitle,
   emptyDescription,
+  className,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -53,16 +56,16 @@ export function DataTable<TData, TValue>({
   });
 
   if (isLoading) {
-    return <TableSkeleton rows={limit} cols={columns.length} />;
+    return <TableSkeleton rows={limit} cols={columns.length} className={className} />;
   }
 
   return (
-    <div className="w-full bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
+    <div className={cn('data-table-shell', className)}>
+      <div className="data-table-scroll">
+        <table className="data-table" role="grid">
+          <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="bg-slate-50/80 border-b border-slate-200 text-slate-700 uppercase font-semibold tracking-wider">
+              <tr key={headerGroup.id} className="data-table-header-row">
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
                   const isSorted = header.column.getIsSorted();
@@ -70,24 +73,49 @@ export function DataTable<TData, TValue>({
                   return (
                     <th
                       key={header.id}
-                      className="px-4 py-3 font-semibold select-none whitespace-nowrap"
+                      scope="col"
+                      aria-sort={
+                        isSorted === 'asc'
+                          ? 'ascending'
+                          : isSorted === 'desc'
+                            ? 'descending'
+                            : canSort
+                              ? 'none'
+                              : undefined
+                      }
+                      className="data-table-header-cell"
                     >
                       {header.isPlaceholder ? null : (
                         <div
-                          className={`flex items-center space-x-1 ${
-                            canSort ? 'cursor-pointer hover:text-slate-900' : ''
-                          }`}
+                          className={cn(
+                            'data-table-sort-btn',
+                            canSort && 'data-table-sort-btn--sortable',
+                          )}
                           onClick={header.column.getToggleSortingHandler()}
+                          onKeyDown={(e) => {
+                            if (canSort && (e.key === 'Enter' || e.key === ' ')) {
+                              e.preventDefault();
+                              header.column.getToggleSortingHandler()?.(e);
+                            }
+                          }}
+                          role={canSort ? 'button' : undefined}
+                          tabIndex={canSort ? 0 : undefined}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {canSort && (
-                            <span className="text-slate-400">
+                            <span
+                              className={cn(
+                                'data-table-sort-icon',
+                                isSorted && 'data-table-sort-icon--active',
+                              )}
+                              aria-hidden
+                            >
                               {isSorted === 'asc' ? (
-                                <ArrowUp className="w-3.5 h-3.5 text-teal-600" />
+                                <ArrowUp className="w-3.5 h-3.5" />
                               ) : isSorted === 'desc' ? (
-                                <ArrowDown className="w-3.5 h-3.5 text-teal-600" />
+                                <ArrowDown className="w-3.5 h-3.5" />
                               ) : (
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-50" />
+                                <ArrowUpDown className="w-3.5 h-3.5" />
                               )}
                             </span>
                           )}
@@ -99,15 +127,12 @@ export function DataTable<TData, TValue>({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-slate-100 text-slate-800">
+          <tbody className="data-table-body">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="hover:bg-slate-50/80 transition-colors"
-                >
+                <tr key={row.id} className="data-table-row">
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3.5 align-middle">
+                    <td key={cell.id} className="data-table-cell">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -116,7 +141,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <tr>
                 <td colSpan={columns.length} className="p-0">
-                  <EmptyState title={emptyTitle} description={emptyDescription} />
+                  <EmptyState title={emptyTitle} description={emptyDescription} embedded />
                 </td>
               </tr>
             )}

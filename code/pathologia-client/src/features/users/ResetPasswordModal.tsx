@@ -53,16 +53,16 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
       <div className="p-6">
         {!result ? (
           <>
-            <p className="text-xs text-slate-600 mb-4">
-              Select password recovery method for <span className="font-bold text-slate-900">{user.fullName}</span> (@{user.username}):
+            <p className="text-xs text-foreground-muted mb-4">
+              Select password recovery method for <span className="font-bold text-foreground">{user.fullName}</span> (@{user.username}):
             </p>
 
             <div className="space-y-3 mb-6">
               <label
                 className={`flex items-start space-x-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
                   sendTemporaryPassword
-                    ? 'bg-teal-50/80 border-teal-300 ring-1 ring-teal-500/20'
-                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                    ? 'bg-accent-subtle/80 border-accent-muted ring-1 ring-accent/20'
+                    : 'bg-surface border-border hover:bg-surface-sunken'
                 }`}
               >
                 <input
@@ -71,14 +71,14 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
                   value="temp_password"
                   checked={sendTemporaryPassword}
                   onChange={() => setSendTemporaryPassword(true)}
-                  className="mt-0.5 text-teal-600 focus:ring-teal-500"
+                  className="mt-0.5 text-accent focus-ring"
                 />
                 <div>
-                  <div className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+                  <div className="text-xs font-bold text-foreground flex items-center space-x-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-accent" />
                     <span>Send Temporary Password via Email</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-foreground-muted mt-0.5">
                     Generates a temporary password and sends it to the user&apos;s email.
                   </p>
                 </div>
@@ -87,8 +87,8 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               <label
                 className={`flex items-start space-x-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
                   !sendTemporaryPassword
-                    ? 'bg-teal-50/80 border-teal-300 ring-1 ring-teal-500/20'
-                    : 'bg-white border-slate-200 hover:bg-slate-50'
+                    ? 'bg-accent-subtle/80 border-accent-muted ring-1 ring-accent/20'
+                    : 'bg-surface border-border hover:bg-surface-sunken'
                 }`}
               >
                 <input
@@ -97,26 +97,26 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
                   value="reset_link"
                   checked={!sendTemporaryPassword}
                   onChange={() => setSendTemporaryPassword(false)}
-                  className="mt-0.5 text-teal-600 focus:ring-teal-500"
+                  className="mt-0.5 text-accent focus-ring"
                 />
                 <div>
-                  <div className="text-xs font-bold text-slate-900 flex items-center space-x-1.5">
-                    <Mail className="w-3.5 h-3.5 text-teal-600" />
+                  <div className="text-xs font-bold text-foreground flex items-center space-x-1.5">
+                    <Mail className="w-3.5 h-3.5 text-accent" />
                     <span>Send Password Reset Link</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-foreground-muted mt-0.5">
                     Sends a secure reset link to the user email ({user.email}).
                   </p>
                 </div>
               </label>
             </div>
 
-            <div className="flex justify-end space-x-3 border-t border-slate-100 pt-4">
+            <div className="flex justify-end space-x-3 border-t border-border-subtle pt-4">
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={isLoading}
-                className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-foreground-secondary bg-surface border border-border rounded-lg hover:bg-surface-sunken transition-colors"
               >
                 Cancel
               </button>
@@ -124,10 +124,10 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
                 type="button"
                 onClick={handleConfirm}
                 disabled={isLoading}
-                className="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-2xs transition-colors flex items-center space-x-2"
+                className="btn-primary"
               >
                 {isLoading ? (
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="spinner-on-accent" />
                 ) : (
                   <>
                     <KeyRound className="w-3.5 h-3.5" />
@@ -139,23 +139,23 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
           </>
         ) : (
           <div className="space-y-4">
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-              <h4 className="text-xs font-bold text-emerald-900 mb-1">Password Reset Successful</h4>
+            <div className="p-4 bg-success-muted border border-success-border rounded-xl">
+              <h4 className="text-xs font-bold text-success mb-1">Password Reset Successful</h4>
               {result.temporaryPassword && (
                 <div className="mt-3">
-                  <p className="text-[11px] text-emerald-700 mb-1">Temporary Password:</p>
-                  <div className="flex items-center justify-between p-2.5 bg-white border border-emerald-300 rounded-lg">
-                    <code className="text-sm font-bold text-slate-900 font-mono">
+                  <p className="text-[11px] text-success mb-1">Temporary Password:</p>
+                  <div className="flex items-center justify-between p-2.5 bg-surface border border-success-border rounded-lg">
+                    <code className="text-sm font-bold text-foreground font-mono">
                       {result.temporaryPassword}
                     </code>
                     <button
                       type="button"
                       onClick={() => copyToClipboard(result.temporaryPassword!)}
-                      className="p-1.5 text-slate-500 hover:text-slate-800 rounded-md hover:bg-slate-100 transition-colors"
+                      className="p-1.5 text-foreground-muted hover:text-foreground rounded-md hover:bg-surface-sunken transition-colors"
                       title="Copy temporary password"
                     >
                       {copied ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
+                        <Check className="w-4 h-4 text-success" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
@@ -165,7 +165,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               )}
 
               {!result.temporaryPassword && (
-                <p className="text-xs text-emerald-800 mt-2">
+                <p className="text-xs text-success mt-2">
                   {sendTemporaryPassword
                     ? `A temporary password has been sent to ${user.email}.`
                     : `A reset link has been dispatched to ${user.email}.`}
@@ -177,7 +177,7 @@ export const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg"
+                className="btn-primary"
               >
                 Close
               </button>

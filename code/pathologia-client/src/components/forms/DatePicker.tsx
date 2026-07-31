@@ -7,7 +7,7 @@ export const DatePicker = forwardRef<HTMLInputElement, InputProps>((props, ref) 
     <Input
       ref={ref}
       type="date"
-      leftIcon={<Calendar className="w-4 h-4 text-slate-400" />}
+      leftIcon={<Calendar className="w-4 h-4 text-foreground-subtle" />}
       {...props}
     />
   );

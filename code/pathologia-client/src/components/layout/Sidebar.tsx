@@ -5,15 +5,13 @@ import {
   Users,
   User,
   Activity,
-  ChevronLeft,
-  ChevronRight,
-  ShieldCheck,
-  Stethoscope,
   ArrowLeftRight,
   FlaskConical,
   UserPlus,
   CalendarCheck,
+  Menu,
 } from 'lucide-react';
+import { Logo } from '../common/Logo';
 import { useAuth } from '../../hooks/useAuth';
 import { useSidebarStore } from '../../store/sidebarStore';
 import { cn } from '../../lib/utils';
@@ -21,8 +19,6 @@ import { cn } from '../../lib/utils';
 export const Sidebar: React.FC = () => {
   const { user } = useAuth();
   const { isCollapsed, isMobileOpen, toggleCollapse, closeMobile } = useSidebarStore();
-
-  const isAdmin = user?.role === 'ADMIN';
 
   const navItems = [
     {
@@ -62,7 +58,7 @@ export const Sidebar: React.FC = () => {
       roles: ['PATHOLOGIST'],
     },
     {
-      label: 'Request & Response',
+      label: 'Audit Logs',
       path: '/request-response',
       icon: ArrowLeftRight,
       roles: ['ADMIN'],
@@ -76,64 +72,75 @@ export const Sidebar: React.FC = () => {
   ];
 
   const filteredNavItems = navItems.filter((item) =>
-    item.roles.includes(user?.role || 'PATHOLOGIST')
+    item.roles.includes(user?.role || 'PATHOLOGIST'),
   );
 
   return (
     <>
-      {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 modal-overlay backdrop-blur-xs lg:hidden"
           onClick={closeMobile}
         />
       )}
 
-      {/* Sidebar Container */}
       <aside
         className={cn(
-          'fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r border-slate-200 bg-slate-900 text-slate-300 transition-all duration-300 ease-in-out',
-          isCollapsed ? 'w-20' : 'w-64',
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          'fixed top-0 bottom-0 left-0 z-40 flex flex-col border-r border-sidebar-border bg-sidebar text-sidebar-text transition-[width] duration-300 ease-in-out',
+          isCollapsed ? 'w-[52px]' : 'w-64',
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         )}
       >
-        {/* Brand Header */}
-        <div className="flex h-16 items-center justify-between border-b border-slate-800 px-4">
-          <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-teal-600 text-white shadow-md shrink-0">
-              <Activity className="w-5 h-5" />
-            </div>
-            {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="text-base font-black text-white tracking-tight leading-none">
-                  Path<span className="text-teal-400">ologia</span>
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium tracking-wider uppercase mt-1">
-                  Medical Platform
-                </span>
+        {/* Top bar — ChatGPT-style panel toggle */}
+        <div
+          className={cn(
+            'flex h-14 shrink-0 items-center border-b border-sidebar-border px-3',
+            isCollapsed ? 'justify-center' : 'justify-between',
+          )}
+        >
+          {isCollapsed ? (
+            <button
+              type="button"
+              onClick={toggleCollapse}
+              className="hidden lg:flex items-center justify-center rounded-lg p-1 transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-highlight"
+              title="Expand sidebar"
+              aria-label="Expand sidebar"
+            >
+              <Logo size="sm" />
+            </button>
+          ) : (
+            <>
+              <div className="hidden lg:flex min-w-0 items-center gap-2.5 overflow-hidden">
+                <Logo size="md" />
+                <div className="min-w-0">
+                  <p className="sidebar-brand-title">Pathologia</p>
+                  <p className="mt-0.5 truncate text-[10px] text-sidebar-text-muted">Medical Platform</p>
+                </div>
               </div>
-            )}
-          </div>
-
-          {/* Desktop Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleCollapse}
-            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
-            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-          </button>
-        </div>
-
-        {/* Navigation Items */}
-        <nav className="flex-1 space-y-1.5 p-3 overflow-y-auto">
-          {!isCollapsed && (
-            <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Main Menu
-            </div>
+              <button
+                type="button"
+                onClick={toggleCollapse}
+                className="sidebar-toggle-btn"
+                title="Collapse sidebar"
+                aria-label="Collapse sidebar"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </>
           )}
 
+          {/* Mobile: brand only (menu opens via header) */}
+          <div className="flex min-w-0 items-center gap-2.5 overflow-hidden lg:hidden">
+            <Logo size="md" />
+            <div className="min-w-0">
+              <p className="sidebar-brand-title">Pathologia</p>
+              <p className="mt-0.5 truncate text-[10px] text-sidebar-text-muted">Medical Platform</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 space-y-0.5 overflow-y-auto p-2">
           {filteredNavItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -141,38 +148,23 @@ export const Sidebar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 onClick={closeMobile}
+                title={isCollapsed ? item.label : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 group',
+                    'flex items-center rounded-lg text-xs font-medium transition-colors duration-150',
+                    isCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5',
                     isActive
-                      ? 'bg-teal-600 text-white shadow-sm'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      ? 'sidebar-nav-item--active'
+                      : 'sidebar-nav-item--idle',
                   )
                 }
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                <Icon className="h-[18px] w-[18px] shrink-0" />
                 {!isCollapsed && <span className="truncate">{item.label}</span>}
               </NavLink>
             );
           })}
         </nav>
-
-        {/* Role Footer Card */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/50">
-          <div className="flex items-center space-x-3 p-2 rounded-xl bg-slate-800/80">
-            <div className="p-2 rounded-lg bg-slate-700 text-teal-400 shrink-0">
-              {isAdmin ? <ShieldCheck className="w-4 h-4" /> : <Stethoscope className="w-4 h-4" />}
-            </div>
-            {!isCollapsed && (
-              <div className="overflow-hidden">
-                <div className="text-xs font-bold text-white truncate">{user?.fullName}</div>
-                <div className="text-[10px] text-teal-400 font-medium uppercase tracking-wider">
-                  {user?.role}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
       </aside>
     </>
   );

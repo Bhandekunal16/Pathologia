@@ -30,7 +30,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ customItems }) => {
       if (segment === 'new') label = 'Create User';
       if (segment === 'edit') label = 'Edit User';
       if (segment === 'profile') label = 'My Profile';
-      if (segment === 'request-response') label = 'Request & Response';
+      if (segment === 'request-response') label = 'Audit Logs';
       if (segment === 'pathology-tests') label = 'Pathology Tests';
       if (segment === 'test-booking') label = 'Test Booking';
       if (segment === 'blood-test-tracking') label = 'Blood Test Tracking';
@@ -53,23 +53,23 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ customItems }) => {
   const items = getBreadcrumbs();
 
   return (
-    <nav className="flex items-center text-xs font-medium text-slate-500 py-1" aria-label="Breadcrumb">
+    <nav className="flex items-center text-xs font-medium text-foreground-muted py-1" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-2">
         {items.map((item, index) => (
           <li key={index} className="inline-flex items-center">
-            {index > 0 && <ChevronRight className="w-3.5 h-3.5 mx-1 text-slate-400 shrink-0" />}
+            {index > 0 && <ChevronRight className="w-3.5 h-3.5 mx-1 text-foreground-subtle shrink-0" />}
             {index === 0 && (
-              <Home className="w-3.5 h-3.5 mr-1 text-slate-400 shrink-0" />
+              <Home className="w-3.5 h-3.5 mr-1 text-foreground-subtle shrink-0" />
             )}
             {item.path ? (
               <Link
                 to={item.path}
-                className="hover:text-teal-700 transition-colors duration-150"
+                className="hover:text-accent transition-colors duration-150"
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="text-slate-800 font-semibold">{item.label}</span>
+              <span className="text-foreground font-semibold">{item.label}</span>
             )}
           </li>
         ))}

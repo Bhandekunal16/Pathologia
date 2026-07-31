@@ -48,12 +48,12 @@ export const RegisterPage: React.FC = () => {
 
   if (!token) {
     return (
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-200/80 text-center">
-        <h2 className="text-lg font-bold text-slate-900">Invalid invitation link</h2>
-        <p className="mt-2 text-xs text-slate-500">
+      <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-xl border border-border/80 text-center">
+        <h2 className="text-lg font-bold text-foreground">Invalid invitation link</h2>
+        <p className="mt-2 text-xs text-foreground-muted">
           Please use the registration link from your invitation email.
         </p>
-        <Link to="/login" className="inline-block mt-4 text-xs font-bold text-teal-700 hover:underline">
+        <Link to="/login" className="inline-block mt-4 text-xs font-bold text-accent hover:underline">
           Back to login
         </Link>
       </div>
@@ -62,7 +62,7 @@ export const RegisterPage: React.FC = () => {
 
   if (isValidating) {
     return (
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-200/80 flex justify-center">
+      <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-xl border border-border/80 flex justify-center">
         <LoadingSpinner size="lg" label="Validating invitation..." />
       </div>
     );
@@ -70,12 +70,12 @@ export const RegisterPage: React.FC = () => {
 
   if (validationError || !inviteDetails) {
     return (
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-200/80 text-center">
-        <h2 className="text-lg font-bold text-slate-900">Invitation unavailable</h2>
-        <p className="mt-2 text-xs text-slate-500">
+      <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-xl border border-border/80 text-center">
+        <h2 className="text-lg font-bold text-foreground">Invitation unavailable</h2>
+        <p className="mt-2 text-xs text-foreground-muted">
           This invite link is invalid, expired, or has already been used.
         </p>
-        <Link to="/login" className="inline-block mt-4 text-xs font-bold text-teal-700 hover:underline">
+        <Link to="/login" className="inline-block mt-4 text-xs font-bold text-accent hover:underline">
           Back to login
         </Link>
       </div>
@@ -83,29 +83,29 @@ export const RegisterPage: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-slate-200/80">
+    <div className="w-full max-w-md bg-surface p-8 rounded-2xl shadow-xl border border-border/80">
       <div className="flex flex-col items-center text-center mb-8">
-        <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-600 text-white shadow-lg mb-4">
+        <div className="flex items-center justify-center w-14 h-14 rounded-2xl accent-glass mb-4">
           <Activity className="w-8 h-8" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="text-2xl font-extrabold text-foreground tracking-tight">
           Complete Registration
         </h2>
-        <p className="mt-1 text-xs text-slate-500 max-w-xs leading-relaxed">
+        <p className="mt-1 text-xs text-foreground-muted max-w-xs leading-relaxed">
           {inviteDetails.inviterName
             ? `${inviteDetails.inviterName} invited you to join Pathologia.`
             : 'You have been invited to join Pathologia.'}
         </p>
       </div>
 
-      <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs space-y-2">
+      <div className="mb-5 rounded-xl border border-border bg-surface-sunken p-4 text-xs space-y-2">
         <div className="flex justify-between gap-3">
-          <span className="text-slate-500">Email</span>
-          <span className="font-semibold text-slate-800">{inviteDetails.email}</span>
+          <span className="text-foreground-muted">Email</span>
+          <span className="font-semibold text-foreground">{inviteDetails.email}</span>
         </div>
         <div className="flex justify-between gap-3">
-          <span className="text-slate-500">Expires</span>
-          <span className="font-semibold text-slate-800">{formatDate(inviteDetails.expiresAt)}</span>
+          <span className="text-foreground-muted">Expires</span>
+          <span className="font-semibold text-foreground">{formatDate(inviteDetails.expiresAt)}</span>
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export const RegisterPage: React.FC = () => {
         <Input
           label="Full Name"
           placeholder="Enter your full name"
-          leftIcon={<User className="w-4 h-4 text-slate-400" />}
+          leftIcon={<User className="w-4 h-4 text-foreground-subtle" />}
           error={errors.fullName?.message}
           required
           {...register('fullName')}
@@ -138,10 +138,10 @@ export const RegisterPage: React.FC = () => {
         <button
           type="submit"
           disabled={isRegistering}
-          className="w-full mt-2 py-2.5 px-4 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-md disabled:opacity-50 transition-all flex items-center justify-center space-x-2"
+          className="btn-primary w-full mt-2 justify-center"
         >
           {isRegistering ? (
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="spinner-on-accent" />
           ) : (
             <>
               <UserPlus className="w-4 h-4" />
@@ -151,9 +151,9 @@ export const RegisterPage: React.FC = () => {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-xs text-slate-500">
+      <p className="mt-4 text-center text-xs text-foreground-muted">
         Already have an account?{' '}
-        <Link to="/login" className="font-bold text-teal-700 hover:underline">
+        <Link to="/login" className="font-bold text-accent hover:underline">
           Sign in
         </Link>
       </p>

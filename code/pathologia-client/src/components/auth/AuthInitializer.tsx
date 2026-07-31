@@ -58,7 +58,7 @@ export const AuthInitializer: React.FC<AuthInitializerProps> = ({ children }) =>
 
   if (!isReady) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-surface-sunken">
         <LoadingSpinner size="lg" label="Initializing session..." />
       </div>
     );

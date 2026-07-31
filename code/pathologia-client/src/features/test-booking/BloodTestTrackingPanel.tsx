@@ -55,10 +55,10 @@ export const BloodTestTrackingPanel: React.FC<BloodTestTrackingPanelProps> = ({
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 p-4 bg-white">
+    <div className="rounded-xl border border-border p-4 bg-surface">
       <div className="mb-4">
-        <p className="text-sm font-bold text-slate-900">{test.name}</p>
-        <p className="text-xs text-slate-500">{test.code}</p>
+        <p className="text-sm font-bold text-foreground">{test.name}</p>
+        <p className="text-xs text-foreground-muted">{test.code}</p>
       </div>
       <BloodTestTimeline
         test={test}

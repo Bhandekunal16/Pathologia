@@ -37,20 +37,20 @@ export const AuditLogDetailModal: React.FC<AuditLogDetailModalProps> = ({
       maxWidth="2xl"
     >
       <div className="px-6 py-4 space-y-4">
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+        <div className="rounded-xl border border-border bg-surface-sunken/70 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <p className="text-sm font-bold text-slate-900">{formatAuditAction(log.action)}</p>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-sm font-bold text-foreground">{formatAuditAction(log.action)}</p>
+              <p className="text-xs text-foreground-muted mt-0.5">
                 {log.userName || 'System'}
                 {log.userEmail ? ` • ${log.userEmail}` : ''}
               </p>
             </div>
-            <span className="text-[11px] text-slate-500">{formatDate(log.createdAt)}</span>
+            <span className="text-[11px] text-foreground-muted">{formatDate(log.createdAt)}</span>
           </div>
         </div>
 
-        <div className="flex border-b border-slate-200">
+        <div className="flex border-b border-border">
           {(['request', 'response'] as DetailTab[]).map((tab) => (
             <button
               key={tab}
@@ -59,8 +59,8 @@ export const AuditLogDetailModal: React.FC<AuditLogDetailModalProps> = ({
               className={cn(
                 'px-4 py-2 text-xs font-bold border-b-2 transition-colors capitalize',
                 activeTab === tab
-                  ? 'border-teal-600 text-teal-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-800'
+                  ? 'border-accent text-accent'
+                  : 'border-transparent text-foreground-muted hover:text-foreground'
               )}
             >
               {tab}
@@ -68,8 +68,8 @@ export const AuditLogDetailModal: React.FC<AuditLogDetailModalProps> = ({
           ))}
         </div>
 
-        <div className="rounded-xl border border-slate-200 bg-slate-950 overflow-hidden">
-          <pre className="p-4 text-[11px] leading-relaxed text-emerald-300 overflow-x-auto max-h-[420px]">
+        <div className="rounded-xl border border-border bg-sidebar overflow-hidden">
+          <pre className="p-4 text-[11px] leading-relaxed text-success overflow-x-auto max-h-[420px]">
             {JSON.stringify(
               activeTab === 'request' ? requestPayload : responsePayload,
               null,

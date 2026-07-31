@@ -9,12 +9,12 @@ export const DashboardLayout: React.FC = () => {
   const { isCollapsed } = useSidebarStore();
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-50/50 text-slate-800">
+    <div className="h-screen overflow-hidden bg-surface-muted text-foreground">
       <Sidebar />
       <div
         className={cn(
           'flex h-screen min-w-0 flex-col transition-all duration-300 ease-in-out',
-          isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
+          isCollapsed ? 'lg:ml-[52px]' : 'lg:ml-64'
         )}
       >
         <Header />

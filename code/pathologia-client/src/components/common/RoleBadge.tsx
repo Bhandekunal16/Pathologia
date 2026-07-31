@@ -15,20 +15,20 @@ const roleConfig: Record<
   ADMIN: {
     label: 'Admin',
     icon: ShieldCheck,
-    className: 'bg-purple-50 text-purple-800 border-purple-200',
-    iconClassName: 'text-purple-600',
+    className: 'bg-admin-muted text-admin border-admin-border',
+    iconClassName: 'text-admin',
   },
   PATHOLOGIST: {
     label: 'Pathologist',
     icon: Stethoscope,
-    className: 'bg-teal-50 text-teal-800 border-teal-200',
-    iconClassName: 'text-teal-600',
+    className: 'bg-accent-subtle text-accent border-accent-muted',
+    iconClassName: 'text-accent',
   },
   USER: {
     label: 'User',
     icon: UserIcon,
-    className: 'bg-slate-50 text-slate-700 border-slate-200',
-    iconClassName: 'text-slate-600',
+    className: 'bg-surface-sunken text-foreground-secondary border-border',
+    iconClassName: 'text-foreground-muted',
   },
 };
 
@@ -38,7 +38,7 @@ export const RoleBadge: React.FC<RoleBadgeProps> = ({ role, className }) => {
   return (
     <span
       className={cn(
-        'inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border shadow-2xs',
+        'inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border shadow-card',
         roleClassName,
         className
       )}

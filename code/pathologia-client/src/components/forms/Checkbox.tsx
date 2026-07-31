@@ -18,18 +18,18 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             id={checkboxId}
             ref={ref}
             className={cn(
-              'h-4 w-4 rounded-sm border-slate-300 text-teal-600 focus:ring-teal-500/20 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50',
+              'h-4 w-4 rounded-sm border-border text-accent focus-ring focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50',
               className
             )}
             {...props}
           />
           {label && (
-            <label htmlFor={checkboxId} className="text-xs font-medium text-slate-700 cursor-pointer select-none">
+            <label htmlFor={checkboxId} className="text-xs font-medium text-foreground-secondary cursor-pointer select-none">
               {label}
             </label>
           )}
         </div>
-        {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
+        {error && <p className="text-xs text-danger font-medium">{error}</p>}
       </div>
     );
   }

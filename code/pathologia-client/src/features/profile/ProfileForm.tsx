@@ -57,13 +57,13 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-6"
+      className="bg-surface p-6 rounded-xl border border-border shadow-card space-y-6"
     >
-      <div className="border-b border-slate-100 pb-4">
-        <h3 className="text-base font-bold text-slate-900">
+      <div className="border-b border-border-subtle pb-4">
+        <h3 className="text-base font-bold text-foreground">
           {showClinicalFields ? 'Personal & Clinical Information' : 'Personal Information'}
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-foreground-muted mt-0.5">
           {isAdmin
             ? 'Update your account details. Department is fixed for administrators.'
             : isPathologist
@@ -72,12 +72,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         </p>
       </div>
 
-      <div className="flex items-center space-x-4 p-4 bg-slate-50/80 rounded-xl border border-slate-100">
+      <div className="flex items-center space-x-4 p-4 bg-surface-sunken/80 rounded-xl border border-border-subtle">
         <Avatar name={user.fullName} size="xl" />
         <div>
-          <h4 className="text-sm font-bold text-slate-900">{user.fullName}</h4>
-          <p className="text-xs text-slate-500">{user.email}</p>
-          <span className="inline-block mt-1 text-[11px] font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-2.5 py-0.5 rounded-full">
+          <h4 className="text-sm font-bold text-foreground">{user.fullName}</h4>
+          <p className="text-xs text-foreground-muted">{user.email}</p>
+          <span className="inline-block mt-1 text-[11px] font-semibold text-accent bg-accent-subtle border border-accent-muted px-2.5 py-0.5 rounded-full">
             {user.role}
           </span>
         </div>
@@ -135,14 +135,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
         )}
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-slate-100">
+      <div className="flex justify-end pt-4 border-t border-border-subtle">
         <button
           type="submit"
           disabled={isLoading || !isDirty}
-          className="px-5 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-2xs disabled:opacity-50 transition-colors flex items-center space-x-2"
+          className="btn-primary"
         >
           {isLoading && (
-            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="spinner-on-accent" />
           )}
           <span>Update Profile</span>
         </button>

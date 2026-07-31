@@ -6,6 +6,26 @@
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pathologia</title>
+    <script>
+      (function () {
+        var modeKey = 'pathologia_theme_mode';
+        var paletteKey = 'pathologia_theme_palette';
+        var palettes = ['teal', 'emerald', 'mint', 'forest', 'sage', 'pine'];
+        var storedMode = localStorage.getItem(modeKey);
+        var mode =
+          storedMode === 'light' || storedMode === 'dark' || storedMode === 'system'
+            ? storedMode
+            : 'system';
+        var storedPalette = localStorage.getItem(paletteKey);
+        var palette = palettes.indexOf(storedPalette) >= 0 ? storedPalette : 'teal';
+        var dark =
+          mode === 'dark' ||
+          (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-palette', palette);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

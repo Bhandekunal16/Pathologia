@@ -6,6 +6,7 @@ import { Input } from '../../components/forms/Input';
 import { Select } from '../../components/forms/Select';
 import { Textarea } from '../../components/forms/Textarea';
 import { Modal } from '../../components/common/Modal';
+import { Button } from '../../components/ui/Button';
 import {
   PathologyTest,
   TEST_CATEGORY_OPTIONS,
@@ -156,22 +157,13 @@ export const PathologyTestFormModal: React.FC<PathologyTestFormModalProps> = ({
           {...register('manual')}
         />
 
-        <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors disabled:opacity-50"
-          >
+        <div className="flex justify-end gap-3 pt-2 border-t border-border-subtle">
+          <Button type="button" variant="secondary" size="md" onClick={onClose} disabled={isLoading}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl transition-colors disabled:opacity-50"
-          >
-            {isLoading ? 'Saving...' : isEdit ? 'Update Test' : 'Add Test'}
-          </button>
+          </Button>
+          <Button type="submit" size="md" disabled={isLoading} isLoading={isLoading}>
+            {isEdit ? 'Update Test' : 'Add Test'}
+          </Button>
         </div>
       </form>
     </Modal>

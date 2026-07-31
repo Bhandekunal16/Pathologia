@@ -22,7 +22,7 @@ export const Avatar: React.FC<AvatarProps> = ({ name, src, size = 'md', classNam
   return (
     <div
       className={cn(
-        'relative inline-flex items-center justify-center rounded-full overflow-hidden shrink-0 border border-teal-100 bg-teal-50 text-teal-800 font-semibold shadow-xs select-none',
+        'avatar relative inline-flex items-center justify-center rounded-xl overflow-hidden shrink-0 select-none',
         sizeClasses[size],
         className
       )}
@@ -35,7 +35,7 @@ export const Avatar: React.FC<AvatarProps> = ({ name, src, size = 'md', classNam
           className="w-full h-full object-cover"
         />
       ) : (
-        <span>{getInitials(name)}</span>
+        <span className="avatar-initial">{getInitials(name)}</span>
       )}
     </div>
   );

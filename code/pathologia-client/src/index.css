@@ -1,1 +1,832 @@
 @import "tailwindcss";
+@import "./styles/theme-palettes.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Semantic theme tokens (palette scales set in theme-palettes.css) ─── */
+@theme {
+  /* Primary scale aliases */
+  --color-primary-50: var(--palette-50);
+  --color-primary-100: var(--palette-100);
+  --color-primary-200: var(--palette-200);
+  --color-primary-300: var(--palette-300);
+  --color-primary-400: var(--palette-400);
+  --color-primary-500: var(--palette-500);
+  --color-primary-600: var(--palette-600);
+  --color-primary-700: var(--palette-700);
+  --color-primary-800: var(--palette-800);
+  --color-primary-900: var(--palette-900);
+  --color-primary-950: var(--palette-950);
+
+  /* Brand palette (overridden per data-palette) */
+  --color-brand-background: #f8fafc;
+  --color-brand-card: #ffffff;
+
+  /* Semantic surfaces */
+  --color-surface: var(--color-brand-card);
+  --color-surface-muted: var(--color-brand-background);
+  --color-surface-sunken: var(--palette-50);
+  --color-surface-elevated: var(--color-brand-card);
+
+  /* Semantic borders */
+  --color-border: #e2e8f0;
+  --color-border-subtle: #f1f5f9;
+  --color-divider: #f1f5f9;
+
+  /* Semantic text */
+  --color-foreground: #0f172a;
+  --color-foreground-secondary: #334155;
+  --color-foreground-muted: #64748b;
+  --color-foreground-subtle: #94a3b8;
+
+  /* Interactive / brand */
+  --color-accent: var(--color-brand-primary);
+  --color-accent-hover: var(--palette-800);
+  --color-secondary: var(--color-brand-secondary);
+  --color-highlight: var(--color-brand-highlight);
+  --color-accent-muted: var(--palette-200);
+  --color-accent-subtle: var(--palette-50);
+
+  /* On-accent / button label — fixed white (not tied to page surface) */
+  --color-brand-on-primary: var(--color-brand-card);
+  --color-accent-foreground: var(--color-brand-on-primary);
+  --color-on-accent: var(--color-brand-on-primary);
+  --color-on-sidebar: var(--color-brand-on-primary);
+  --color-on-danger: var(--color-brand-on-primary);
+  --color-on-warning: var(--color-brand-on-primary);
+  --color-on-success: var(--color-brand-on-primary);
+  --color-on-info: var(--color-brand-on-primary);
+
+  /* Sidebar foreground for high-contrast labels on dark chrome */
+  --color-sidebar-foreground: var(--color-on-sidebar);
+
+  /* Accent buttons & glass — stable palette (same in light and dark page themes) */
+  --color-button-accent: var(--color-brand-primary);
+  --color-button-glass-fill: color-mix(in srgb, var(--color-button-accent) 72%, transparent);
+  --color-button-glass-fill-hover: color-mix(in srgb, var(--color-button-accent) 82%, transparent);
+  --color-button-glass-fill-active: color-mix(in srgb, var(--color-button-accent) 88%, transparent);
+  --color-button-glass-border: color-mix(in srgb, var(--color-brand-on-primary) 35%, transparent);
+  --color-button-glass-highlight: color-mix(in srgb, var(--color-brand-on-primary) 28%, transparent);
+  --color-button-glass-highlight-strong: color-mix(in srgb, var(--color-brand-on-primary) 35%, transparent);
+  --color-button-glass-highlight-subtle: color-mix(in srgb, var(--color-brand-on-primary) 20%, transparent);
+  --color-button-glass-shadow: color-mix(in srgb, var(--color-button-accent) 28%, transparent);
+  --color-button-glass-shadow-hover: color-mix(in srgb, var(--color-button-accent) 34%, transparent);
+  --color-button-glass-shadow-active: color-mix(in srgb, var(--color-button-accent) 22%, transparent);
+  --color-button-glass-shadow-sm: color-mix(in srgb, var(--color-button-accent) 24%, transparent);
+
+  /* Glass morphism (accent buttons — uses stable button palette) */
+  --color-glass-fill: var(--color-button-glass-fill);
+  --color-glass-fill-hover: var(--color-button-glass-fill-hover);
+  --color-glass-fill-active: var(--color-button-glass-fill-active);
+  --color-glass-border: var(--color-button-glass-border);
+  --color-glass-highlight: var(--color-button-glass-highlight);
+  --color-glass-highlight-strong: var(--color-button-glass-highlight-strong);
+  --color-glass-highlight-subtle: var(--color-button-glass-highlight-subtle);
+  --color-glass-shadow: var(--color-button-glass-shadow);
+  --color-glass-shadow-hover: var(--color-button-glass-shadow-hover);
+  --color-glass-shadow-active: var(--color-button-glass-shadow-active);
+  --color-glass-shadow-sm: var(--color-button-glass-shadow-sm);
+  --shadow-glass:
+    0 4px 14px var(--color-glass-shadow),
+    inset 0 1px 0 var(--color-glass-highlight);
+  --shadow-glass-hover:
+    0 6px 20px var(--color-glass-shadow-hover),
+    inset 0 1px 0 var(--color-glass-highlight-strong);
+  --shadow-glass-active:
+    0 2px 8px var(--color-glass-shadow-active),
+    inset 0 1px 0 var(--color-glass-highlight-subtle);
+  --shadow-glass-sm:
+    0 2px 10px var(--color-glass-shadow-sm),
+    inset 0 1px 0 var(--color-glass-highlight);
+
+  /* Focus & feedback */
+  --color-focus: var(--color-brand-highlight);
+  --color-focus-ring: color-mix(in srgb, var(--color-brand-highlight) 40%, transparent);
+
+  /* Table-specific */
+  --color-table-header: var(--color-brand-background);
+  --color-table-row-hover: color-mix(in srgb, var(--palette-50) 80%, var(--color-surface));
+  --color-table-row-stripe: color-mix(in srgb, var(--color-brand-background) 60%, var(--color-surface));
+  --color-table-row-accent: var(--color-brand-secondary);
+
+  /* Status */
+  --color-danger: #dc2626;
+  --color-danger-muted: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-warning: #f59e0b;
+  --color-warning-muted: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-info: var(--color-brand-secondary);
+  --color-info-muted: var(--palette-50);
+  --color-info-border: var(--palette-200);
+  --color-success: #16a34a;
+  --color-success-muted: #f0fdf4;
+  --color-success-border: #bbf7d0;
+  --color-admin: #6d28d9;
+  --color-admin-muted: #f5f3ff;
+  --color-admin-border: #ddd6fe;
+
+  /* Layout: sidebar & overlays */
+  --color-sidebar: var(--palette-950);
+  --color-sidebar-border: var(--palette-900);
+  --color-sidebar-text: var(--palette-100);
+  --color-sidebar-text-muted: var(--palette-400);
+  --color-sidebar-hover: var(--palette-900);
+  --color-sidebar-active: var(--palette-800);
+  --color-overlay: color-mix(in srgb, var(--palette-950) 40%, transparent);
+
+  /* Typography & spacing */
+  --text-body: 0.875rem;
+  --text-secondary: 0.75rem;
+  --text-caption: 0.6875rem;
+
+  --spacing-touch: 2.75rem;
+  --radius-card: 0.75rem;
+  --radius-control: 0.5rem;
+
+  --shadow-card: 0 1px 3px 0 color-mix(in srgb, var(--color-foreground) 5%, transparent),
+    0 1px 2px -1px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+  --shadow-elevated: 0 4px 6px -1px color-mix(in srgb, var(--color-foreground) 6%, transparent),
+    0 2px 4px -2px color-mix(in srgb, var(--color-foreground) 4%, transparent);
+}
+
+@layer base {
+  :root {
+    --toast-bg: var(--color-sidebar);
+    --toast-text: var(--color-on-sidebar);
+    --toast-success: var(--color-success);
+    --toast-error: var(--color-danger);
+  }
+
+  body {
+    @apply text-foreground antialiased bg-surface-muted;
+    font-size: var(--text-body);
+  }
+
+  /* Dark mode — override theme tokens (keeps components on semantic colors) */
+  .dark {
+    --color-brand-background: #0b1220;
+    --color-brand-card: #151f32;
+    --color-border: #2d3a4f;
+    --color-border-subtle: #1e293b;
+    --color-divider: #243044;
+
+    --color-foreground: #f1f5f9;
+    --color-foreground-secondary: #cbd5e1;
+    --color-foreground-muted: #94a3b8;
+    --color-foreground-subtle: #64748b;
+
+    --color-surface-sunken: #0f172a;
+    --color-accent-hover: var(--palette-600);
+    --color-accent-muted: var(--palette-800);
+    --color-accent-subtle: color-mix(in srgb, var(--palette-900) 55%, var(--color-brand-card));
+
+    --color-table-header: #0f172a;
+    --color-table-row-hover: color-mix(in srgb, var(--palette-900) 45%, var(--color-surface));
+    --color-table-row-stripe: color-mix(in srgb, var(--color-brand-background) 70%, var(--color-surface));
+
+    --color-danger-muted: color-mix(in srgb, var(--color-danger) 18%, var(--color-brand-card));
+    --color-danger-border: color-mix(in srgb, var(--color-danger) 35%, var(--color-brand-card));
+    --color-warning-muted: color-mix(in srgb, var(--color-warning) 18%, var(--color-brand-card));
+    --color-warning-border: color-mix(in srgb, var(--color-warning) 35%, var(--color-brand-card));
+    --color-success-muted: color-mix(in srgb, var(--color-success) 18%, var(--color-brand-card));
+    --color-success-border: color-mix(in srgb, var(--color-success) 35%, var(--color-brand-card));
+    --color-info-muted: color-mix(in srgb, var(--color-info) 18%, var(--color-brand-card));
+    --color-info-border: color-mix(in srgb, var(--color-info) 35%, var(--color-brand-card));
+    --color-admin-muted: color-mix(in srgb, var(--color-admin) 18%, var(--color-brand-card));
+    --color-admin-border: color-mix(in srgb, var(--color-admin) 35%, var(--color-brand-card));
+
+    --color-overlay: color-mix(in srgb, var(--color-brand-background) 55%, transparent);
+
+    /* Accent buttons & glass — keep light-mode appearance */
+    --color-brand-on-primary: #ffffff;
+    --color-accent-foreground: var(--color-brand-on-primary);
+    --color-on-accent: var(--color-brand-on-primary);
+    --color-on-sidebar: var(--color-brand-on-primary);
+    --color-on-danger: var(--color-brand-on-primary);
+    --color-on-warning: var(--color-brand-on-primary);
+    --color-on-success: var(--color-brand-on-primary);
+    --color-on-info: var(--color-brand-on-primary);
+    --color-button-glass-border: color-mix(in srgb, var(--color-brand-on-primary) 35%, transparent);
+    --color-button-glass-highlight: color-mix(in srgb, var(--color-brand-on-primary) 28%, transparent);
+    --color-button-glass-highlight-strong: color-mix(in srgb, var(--color-brand-on-primary) 35%, transparent);
+    --color-button-glass-highlight-subtle: color-mix(in srgb, var(--color-brand-on-primary) 20%, transparent);
+  }
+}
+
+/* ─── Reusable component patterns (change here → updates entire UI) ─── */
+@layer components {
+  /* Data panel: unified filter + table container */
+  .data-panel {
+    @apply rounded-card border border-border bg-surface overflow-hidden;
+    box-shadow: var(--shadow-card);
+  }
+
+  .data-panel-filters {
+    @apply border-0 rounded-none shadow-none border-b border-border-subtle bg-surface;
+  }
+
+  .data-panel-table {
+    @apply border-0 rounded-none shadow-none;
+  }
+
+  /* Form controls */
+  .form-input {
+    @apply w-full text-secondary bg-surface border border-border rounded-control text-foreground
+      placeholder:text-foreground-subtle
+      focus:outline-none focus:ring-2 focus:border-accent transition-all;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .form-select {
+    @apply px-3 py-2 text-secondary bg-surface-sunken border border-border rounded-control
+      text-foreground font-medium min-h-11
+      focus:outline-none focus:ring-2 focus:border-accent transition-all;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  /* Links inside tables */
+  .table-link {
+    @apply font-semibold text-foreground-secondary hover:text-accent transition-colors;
+  }
+
+  .table-meta {
+    @apply text-secondary text-foreground-muted font-normal;
+  }
+
+  .table-cell-text {
+    @apply font-medium text-foreground-secondary;
+  }
+
+  /* Badges */
+  .badge-accent {
+    @apply inline-flex whitespace-nowrap px-2.5 py-0.5 rounded-full text-secondary font-semibold
+      bg-accent-subtle text-accent border border-accent-muted;
+  }
+
+  .badge-muted {
+    @apply inline-flex whitespace-nowrap px-2.5 py-0.5 rounded-full text-secondary font-semibold
+      bg-surface-sunken text-foreground-muted border border-border-subtle;
+  }
+
+  .badge-category {
+    @apply inline-flex px-2 py-0.5 rounded-md text-caption font-semibold
+      bg-accent-subtle text-accent;
+  }
+
+  .badge-category-muted {
+    @apply inline-flex px-2 py-0.5 rounded-md text-caption font-semibold
+      bg-surface-sunken text-foreground-muted;
+  }
+
+  .badge-category-blood {
+    @apply inline-flex items-center px-2 py-1 rounded-lg text-caption font-bold uppercase tracking-wide
+      bg-danger-muted text-danger;
+  }
+
+  .badge-category-urine {
+    @apply inline-flex items-center px-2 py-1 rounded-lg text-caption font-bold uppercase tracking-wide
+      bg-warning-muted text-warning;
+  }
+
+  .badge-category-imaging {
+    @apply inline-flex items-center px-2 py-1 rounded-lg text-caption font-bold uppercase tracking-wide
+      bg-info-muted text-info;
+  }
+
+  .badge-category-body {
+    @apply inline-flex items-center px-2 py-1 rounded-lg text-caption font-bold uppercase tracking-wide
+      bg-accent-subtle text-accent;
+  }
+
+  .badge-category-other {
+    @apply inline-flex items-center px-2 py-1 rounded-lg text-caption font-bold uppercase tracking-wide
+      bg-surface-sunken text-foreground-muted;
+  }
+
+  /* Tabs */
+  .tab-bar {
+    @apply flex border-b border-border;
+  }
+
+  .tab-item {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 text-secondary font-bold border-b-2
+      border-transparent text-foreground-muted hover:text-foreground transition-colors;
+  }
+
+  .tab-item--active {
+    @apply border-accent text-accent;
+  }
+
+  /* Chip / status pill in header — glass morphism */
+  .header-chip {
+    @apply inline-flex items-center gap-2 px-3.5 py-1.5 rounded-card text-secondary font-semibold
+      backdrop-blur-md text-accent-foreground;
+    background: var(--color-glass-fill);
+    border: 1px solid var(--color-glass-border);
+    color: var(--color-on-accent);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .header-chip-icon {
+    @apply text-accent-foreground;
+    color: var(--color-on-accent);
+  }
+
+  /* Glass accent surface — icons, tabs, stepper nodes */
+  .accent-glass {
+    @apply backdrop-blur-md text-accent-foreground;
+    background: var(--color-glass-fill);
+    border: 1px solid var(--color-glass-border);
+    color: var(--color-on-accent);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .accent-glass:hover {
+    background: var(--color-glass-fill-hover);
+  }
+
+  .text-accent-emphasis {
+    @apply text-accent font-semibold;
+  }
+
+  .btn-sm-primary {
+    @apply inline-flex items-center gap-1 px-2.5 py-1.5 text-secondary font-bold
+      rounded-control transition-all disabled:opacity-40 disabled:cursor-not-allowed
+      backdrop-blur-md text-accent-foreground;
+    background: var(--color-glass-fill);
+    border: 1px solid var(--color-glass-border);
+    color: var(--color-on-accent);
+    box-shadow: var(--shadow-glass-sm);
+  }
+
+  .btn-sm-primary:hover {
+    background: var(--color-glass-fill-hover);
+  }
+
+  .input-inline {
+    @apply pl-7 pr-2 py-1.5 text-secondary bg-surface border border-border rounded-control
+      text-foreground font-medium w-28 focus:outline-none focus:ring-2 focus:border-accent;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .input-prefix {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-foreground-subtle;
+  }
+
+  /* Primary action button — glass morphism */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 text-secondary font-bold
+      rounded-card transition-all min-h-11 backdrop-blur-md text-accent-foreground
+      disabled:opacity-50 disabled:cursor-not-allowed;
+    background: var(--color-glass-fill);
+    border: 1px solid var(--color-glass-border);
+    color: var(--color-on-accent);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-glass-fill-hover);
+    box-shadow: var(--shadow-glass-hover);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    background: var(--color-glass-fill-active);
+    box-shadow: var(--shadow-glass-active);
+  }
+
+  /* Spinner on accent / glass buttons */
+  .spinner-on-accent {
+    @apply w-4 h-4 rounded-full animate-spin border-2;
+    border-color: color-mix(in srgb, var(--color-on-accent) 30%, transparent);
+    border-top-color: var(--color-on-accent);
+  }
+
+  /* Sidebar chrome */
+  .sidebar-chip {
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-sidebar text-xs font-semibold
+      text-sidebar-foreground shrink-0;
+  }
+
+  .sidebar-icon-tile {
+    @apply p-2 rounded-lg shadow-card text-sidebar-foreground bg-sidebar-hover;
+  }
+
+  .sidebar-icon-tile-active {
+    @apply p-2 rounded-lg shadow-card text-sidebar-foreground bg-sidebar-active;
+  }
+
+  .sidebar-nav-item--active {
+    @apply bg-sidebar-active text-sidebar-foreground;
+    color: var(--color-on-sidebar);
+  }
+
+  .sidebar-nav-item--idle {
+    @apply text-sidebar-text-muted hover:bg-sidebar-hover hover:text-sidebar-foreground;
+  }
+
+  .sidebar-brand-title {
+    @apply truncate text-sm font-bold leading-none text-sidebar-foreground;
+  }
+
+  .sidebar-toggle-btn {
+    @apply hidden lg:inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+      text-sidebar-text-muted transition-colors hover:bg-sidebar-hover hover:text-sidebar-foreground
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-highlight;
+  }
+
+  .sidebar-action-btn {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sidebar text-xs font-semibold
+      text-sidebar-foreground disabled:opacity-50;
+  }
+
+  /* Code / mono snippets in tables */
+  .table-code {
+    @apply text-secondary text-foreground-secondary bg-surface-sunken px-2 py-1 rounded-control;
+  }
+
+  /* Data table shell */
+  .data-table-shell {
+    @apply w-full bg-surface overflow-hidden;
+  }
+
+  .data-table-scroll {
+    @apply overflow-x-auto;
+  }
+
+  .data-table {
+    @apply w-full text-left border-collapse;
+    font-size: var(--text-secondary);
+  }
+
+  .data-table-header-row {
+    @apply border-b border-border text-foreground-muted font-semibold tracking-wide;
+    background-color: var(--color-table-header);
+  }
+
+  .data-table-header-cell {
+    @apply px-4 py-3.5 select-none whitespace-nowrap text-caption uppercase;
+  }
+
+  .data-table-sort-btn {
+    @apply flex items-center gap-1.5 rounded-control px-1 -mx-1
+      transition-colors focus-visible:outline-none focus-visible:ring-2;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .data-table-sort-btn--sortable {
+    @apply cursor-pointer hover:text-foreground;
+  }
+
+  .data-table-sort-icon {
+    @apply text-foreground-subtle opacity-60;
+  }
+
+  .data-table-sort-icon--active {
+    @apply text-accent opacity-100;
+  }
+
+  .data-table-body {
+    @apply text-foreground-secondary;
+  }
+
+  .data-table-row {
+    @apply transition-colors border-b border-divider last:border-b-0
+      hover:bg-table-row-hover;
+    background-color: transparent;
+  }
+
+  .data-table-row:nth-child(even) {
+    background-color: var(--color-table-row-stripe);
+  }
+
+  .data-table-row:hover {
+    box-shadow: inset 3px 0 0 0 var(--color-table-row-accent);
+  }
+
+  .data-table-cell {
+    @apply px-4 py-3.5 align-middle;
+  }
+
+  /* Pagination — neutral colors (not glass / accent) */
+  .data-table-pagination {
+    @apply flex flex-col sm:flex-row items-center justify-between gap-4
+      px-4 py-3.5 bg-surface border-t border-border text-xs text-foreground-muted;
+  }
+
+  .data-table-pagination-summary {
+    @apply text-foreground-muted;
+  }
+
+  .data-table-pagination-emphasis {
+    @apply font-semibold text-foreground;
+  }
+
+  .pagination-btn {
+    @apply p-1.5 rounded-control border border-border bg-surface text-foreground-muted
+      hover:bg-surface-sunken hover:text-foreground-secondary disabled:opacity-40
+      disabled:cursor-not-allowed transition-colors
+      focus-visible:outline-none focus-visible:ring-2;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .pagination-select {
+    @apply px-2 py-1 text-xs bg-surface border border-border rounded-control
+      font-medium text-foreground-secondary
+      focus:outline-none focus:ring-2 focus:border-accent;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    @apply flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4
+      bg-surface p-4 rounded-card border border-border;
+    box-shadow: var(--shadow-card);
+  }
+
+  .filter-bar-label {
+    @apply flex items-center gap-2 text-secondary font-semibold text-foreground-muted;
+  }
+
+  /* Empty state */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-14 px-6 text-center;
+  }
+
+  .empty-state-icon {
+    @apply p-3.5 bg-accent-subtle border border-accent-muted rounded-full text-accent mb-4;
+    box-shadow: var(--shadow-card);
+  }
+
+  .empty-state-title {
+    @apply text-base font-semibold text-foreground;
+  }
+
+  .empty-state-description {
+    @apply mt-1.5 text-secondary text-foreground-muted max-w-sm leading-relaxed;
+  }
+
+  /* Skeleton */
+  .skeleton {
+    @apply animate-pulse rounded-control bg-border-subtle;
+  }
+
+  .table-skeleton-shell {
+    @apply w-full bg-surface rounded-card border border-border overflow-hidden;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Buttons */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-all
+      bg-surface text-foreground-secondary border border-border hover:bg-surface-sunken
+      focus:outline-none focus:ring-2 disabled:opacity-50;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-all
+      bg-danger text-accent-foreground hover:opacity-90 focus:outline-none focus:ring-2
+      disabled:opacity-50;
+    color: var(--color-on-danger);
+    --tw-ring-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-all
+      text-foreground-muted hover:bg-surface-sunken focus:outline-none focus:ring-2
+      disabled:opacity-50;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .btn-warning {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-all
+      bg-warning text-accent-foreground hover:opacity-90 focus:outline-none focus:ring-2
+      disabled:opacity-50;
+    color: var(--color-on-warning);
+    --tw-ring-color: color-mix(in srgb, var(--color-warning) 30%, transparent);
+  }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-all
+      bg-success text-accent-foreground hover:opacity-90 focus:outline-none focus:ring-2
+      disabled:opacity-50;
+    color: var(--color-on-success);
+    --tw-ring-color: color-mix(in srgb, var(--color-success) 30%, transparent);
+  }
+
+  .btn-info {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition-all
+      bg-info text-accent-foreground hover:opacity-90 focus:outline-none focus:ring-2
+      disabled:opacity-50;
+    color: var(--color-on-info);
+    --tw-ring-color: color-mix(in srgb, var(--color-info) 30%, transparent);
+  }
+
+  /* Icon buttons */
+  .icon-btn {
+    @apply inline-flex items-center justify-center rounded-control transition-colors
+      focus:outline-none focus:ring-2 disabled:opacity-50 disabled:pointer-events-none;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .icon-btn-default {
+    @apply text-foreground-muted hover:text-foreground-secondary hover:bg-surface-sunken;
+  }
+
+  .icon-btn-accent {
+    @apply text-foreground-muted hover:text-accent hover:bg-accent-subtle;
+  }
+
+  .icon-btn-info {
+    @apply text-foreground-muted hover:text-info hover:bg-info-muted;
+  }
+
+  .icon-btn-warning {
+    @apply text-foreground-muted hover:text-warning hover:bg-warning-muted;
+  }
+
+  .icon-btn-admin {
+    @apply text-foreground-muted hover:text-admin hover:bg-admin-muted;
+  }
+
+  .icon-btn-danger {
+    @apply text-foreground-muted hover:text-danger hover:bg-danger-muted;
+  }
+
+  /* Cards & surfaces */
+  .card {
+    @apply bg-surface rounded-card border border-border;
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-muted {
+    @apply bg-surface-sunken rounded-card border border-border-subtle;
+  }
+
+  .page-title {
+    @apply text-foreground font-bold;
+  }
+
+  .page-description {
+    @apply text-foreground-muted;
+  }
+
+  .text-link {
+    @apply text-foreground-secondary hover:text-accent transition-colors;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    background-color: var(--color-overlay);
+  }
+
+  .modal-panel {
+    @apply bg-surface rounded-card border border-border-subtle;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    @apply bg-sidebar text-sidebar-text border-sidebar-border;
+  }
+
+  .sidebar-nav-item {
+    @apply text-sidebar-text-muted hover:bg-sidebar-hover hover:text-sidebar-text transition-colors;
+  }
+
+  .sidebar-nav-item--active {
+    @apply bg-sidebar-active text-sidebar-foreground;
+    color: var(--color-on-sidebar);
+  }
+
+  /* Form field helpers */
+  .field-label {
+    @apply text-foreground-secondary font-medium;
+  }
+
+  .field-hint {
+    @apply text-foreground-muted;
+  }
+
+  .field-error {
+    @apply text-danger;
+  }
+
+  .focus-ring {
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  /* Theme menu picker (user dropdown) */
+  .theme-menu-picker {
+    @apply px-2 py-2 border-t border-border-subtle mt-1;
+  }
+
+  .theme-menu-picker-header {
+    @apply flex items-center gap-2 px-1 mb-2;
+  }
+
+  .theme-menu-picker-label {
+    @apply text-[11px] font-semibold text-foreground-muted;
+  }
+
+  .theme-menu-picker-options {
+    @apply flex gap-1;
+  }
+
+  .theme-menu-picker-btn {
+    @apply flex-1 inline-flex items-center justify-center gap-1 py-2 rounded-lg border border-border
+      bg-surface-sunken text-[11px] font-semibold text-foreground-secondary transition-colors
+      hover:bg-surface-muted focus:outline-none focus-visible:ring-2;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .theme-menu-picker-btn--active {
+    @apply bg-accent-subtle border-accent-muted text-accent;
+  }
+
+  /* Theme palette picker */
+  .theme-palette-grid {
+    @apply grid grid-cols-2 sm:grid-cols-3 gap-3;
+  }
+
+  .theme-palette-grid--compact {
+    @apply grid-cols-3 gap-1.5;
+  }
+
+  .theme-palette-option {
+    @apply relative flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-sunken p-3
+      transition-colors hover:bg-surface-muted focus:outline-none focus-visible:ring-2;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .theme-palette-grid--compact .theme-palette-option {
+    @apply p-2 gap-0;
+  }
+
+  .theme-palette-option--active {
+    @apply border-accent-muted bg-accent-subtle;
+  }
+
+  .theme-palette-swatch {
+    @apply w-full h-8 rounded-lg border border-border-subtle shadow-card;
+  }
+
+  .theme-palette-grid--compact .theme-palette-swatch {
+    @apply h-6 rounded-md;
+  }
+
+  .theme-palette-option-label {
+    @apply text-[11px] font-semibold text-foreground-secondary text-center leading-tight;
+  }
+
+  .theme-palette-check {
+    @apply absolute top-1.5 right-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full
+      bg-surface text-accent border border-accent-muted shadow-card;
+  }
+
+  /* Theme settings (profile) */
+  .theme-settings-grid {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-3;
+  }
+
+  .theme-settings-option {
+    @apply flex flex-col gap-1 rounded-xl border border-border bg-surface-sunken p-4 text-left
+      transition-colors hover:bg-surface-muted focus:outline-none focus-visible:ring-2;
+    --tw-ring-color: var(--color-focus-ring);
+  }
+
+  .theme-settings-option-icon {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-lg bg-surface border border-border
+      text-foreground-muted;
+  }
+
+  .theme-settings-option-label {
+    @apply text-xs font-bold text-foreground;
+  }
+
+  .theme-settings-option-description {
+    @apply text-[11px] text-foreground-muted leading-relaxed;
+  }
+
+  .theme-settings-option--active {
+    @apply border-accent-muted bg-accent-subtle;
+  }
+
+  .theme-settings-option--active .theme-settings-option-icon {
+    @apply border-accent-muted bg-surface text-accent;
+  }
+
+  /* Avatar */
+  .avatar {
+    @apply border border-accent-muted font-semibold shadow-card backdrop-blur-md text-accent-foreground;
+    background: var(--color-glass-fill);
+    border-color: var(--color-glass-border);
+    color: var(--color-on-accent);
+    box-shadow: var(--shadow-glass-sm);
+  }
+
+  .avatar-initial {
+    color: var(--color-on-accent);
+  }
+}

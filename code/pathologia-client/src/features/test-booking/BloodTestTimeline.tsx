@@ -86,7 +86,7 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
                 <div
                   className={cn(
                     'absolute left-[-18px] top-5 w-0.5 h-[calc(100%+8px)]',
-                    complete ? 'bg-teal-500' : 'bg-slate-200',
+                    complete ? 'bg-accent' : 'bg-border',
                   )}
                 />
               )}
@@ -95,8 +95,8 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
                   className={cn(
                     'w-3 h-3 rounded-full border-2',
                     complete
-                      ? 'bg-teal-600 border-teal-600'
-                      : 'bg-white border-slate-300',
+                      ? 'bg-accent border-accent'
+                      : 'bg-surface border-border',
                   )}
                 />
               </div>
@@ -105,18 +105,18 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
                   <p
                     className={cn(
                       'text-xs font-semibold',
-                      complete ? 'text-slate-900' : 'text-slate-400',
+                      complete ? 'text-foreground' : 'text-foreground-subtle',
                     )}
                   >
                     {BLOOD_TEST_STATUS_LABELS[status]}
                   </p>
                   {complete && timestamp ? (
-                    <p className="text-[11px] text-teal-700 mt-0.5 flex items-center gap-1">
+                    <p className="text-[11px] text-accent mt-0.5 flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       {formatDate(timestamp)}
                     </p>
                   ) : (
-                    <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                    <p className="text-[11px] text-foreground-subtle mt-0.5 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       Pending
                     </p>
@@ -129,10 +129,10 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
       </div>
 
       {test.hasReport && test.reportFileName && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs">
-          <p className="font-semibold text-slate-800">📄 {test.reportFileName}</p>
+        <div className="rounded-xl border border-border bg-surface-sunken p-3 text-xs">
+          <p className="font-semibold text-foreground">📄 {test.reportFileName}</p>
           {test.reportUploadedAt && (
-            <p className="text-slate-500 mt-1">Uploaded {formatDate(test.reportUploadedAt)}</p>
+            <p className="text-foreground-muted mt-1">Uploaded {formatDate(test.reportUploadedAt)}</p>
           )}
         </div>
       )}
@@ -143,7 +143,7 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
             type="button"
             disabled={isUpdating}
             onClick={() => onAdvanceStatus(nextStatus)}
-            className="px-3 py-2 rounded-lg bg-teal-600 text-white text-xs font-semibold disabled:opacity-50"
+            className="btn-sm-primary"
           >
             {isUpdating ? 'Updating...' : `Mark as ${BLOOD_TEST_STATUS_LABELS[nextStatus]}`}
           </button>
@@ -162,7 +162,7 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
               type="button"
               disabled={isUploading}
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border bg-surface text-xs font-semibold text-foreground-secondary hover:bg-surface-sunken disabled:opacity-50"
             >
               <Upload className="w-3.5 h-3.5" />
               {isUploading ? 'Uploading...' : 'Upload Report'}
@@ -174,7 +174,7 @@ export const BloodTestTimeline: React.FC<BloodTestTimelineProps> = ({
           <button
             type="button"
             onClick={onDownloadReport}
-            className="px-3 py-2 rounded-lg border border-teal-200 bg-teal-50 text-xs font-semibold text-teal-800 hover:bg-teal-100"
+            className="px-3 py-2 rounded-lg border border-accent-muted bg-accent-subtle text-xs font-semibold text-accent hover:bg-accent-muted"
           >
             Download Report
           </button>

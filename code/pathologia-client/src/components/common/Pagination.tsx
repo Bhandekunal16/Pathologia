@@ -22,21 +22,23 @@ export const Pagination: React.FC<PaginationProps> = ({
   const endItem = Math.min(currentPage * limit, totalRecords);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-white border-t border-slate-200 text-xs text-slate-600">
-      <div className="flex items-center space-x-4">
-        <span>
-          Showing <span className="font-semibold text-slate-900">{startItem}</span> to{' '}
-          <span className="font-semibold text-slate-900">{endItem}</span> of{' '}
-          <span className="font-semibold text-slate-900">{totalRecords}</span> entries
+    <div className="data-table-pagination">
+      <div className="flex items-center flex-wrap gap-x-4 gap-y-2">
+        <span className="data-table-pagination-summary">
+          Showing{' '}
+          <span className="data-table-pagination-emphasis">{startItem}</span> to{' '}
+          <span className="data-table-pagination-emphasis">{endItem}</span> of{' '}
+          <span className="data-table-pagination-emphasis">{totalRecords}</span> entries
         </span>
 
         {onLimitChange && (
-          <div className="flex items-center space-x-2">
-            <span className="text-slate-500">Per page:</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-foreground-muted">Per page:</span>
             <select
               value={limit}
               onChange={(e) => onLimitChange(Number(e.target.value))}
-              className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-md text-xs font-medium text-slate-800 focus:outline-hidden focus:ring-1 focus:ring-teal-500"
+              className="pagination-select"
+              aria-label="Rows per page"
             >
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -47,13 +49,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         )}
       </div>
 
-      <div className="flex items-center space-x-1">
+      <nav className="flex items-center gap-1" aria-label="Table pagination">
         <button
           type="button"
           onClick={() => onPageChange(1)}
           disabled={currentPage <= 1}
-          className="p-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="First Page"
+          className="pagination-btn"
+          title="First page"
+          aria-label="First page"
         >
           <ChevronsLeft className="w-4 h-4" />
         </button>
@@ -61,13 +64,14 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="p-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="Previous Page"
+          className="pagination-btn"
+          title="Previous page"
+          aria-label="Previous page"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
 
-        <span className="px-3 py-1 font-medium text-slate-800">
+        <span className="px-3 py-1 text-xs font-medium text-foreground-secondary min-w-[7rem] text-center">
           Page {currentPage} of {totalPages || 1}
         </span>
 
@@ -75,8 +79,9 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="p-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="Next Page"
+          className="pagination-btn"
+          title="Next page"
+          aria-label="Next page"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -84,12 +89,13 @@ export const Pagination: React.FC<PaginationProps> = ({
           type="button"
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage >= totalPages}
-          className="p-1.5 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="Last Page"
+          className="pagination-btn"
+          title="Last page"
+          aria-label="Last page"
         >
           <ChevronsRight className="w-4 h-4" />
         </button>
-      </div>
+      </nav>
     </div>
   );
 };

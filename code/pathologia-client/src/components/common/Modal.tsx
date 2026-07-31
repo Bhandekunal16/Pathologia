@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -11,6 +11,9 @@ interface ModalProps {
   showHeader?: boolean;
 }
 
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -19,17 +22,55 @@ export const Modal: React.FC<ModalProps> = ({
   maxWidth = 'md',
   showHeader = true,
 }) => {
+  const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (e.key !== 'Tab' || !panelRef.current) return;
+
+      const focusable = panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
+
     if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement | null;
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
+
+      requestAnimationFrame(() => {
+        const panel = panelRef.current;
+        if (!panel) return;
+        const focusable = panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+        if (focusable.length > 0) {
+          focusable[0].focus();
+        }
+      });
     }
+
     return () => {
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
     };
   }, [isOpen, onClose]);
 
@@ -44,28 +85,32 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto" role="presentation">
       <div className="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
-        {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
+          className="fixed inset-0 modal-overlay backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
           onClick={onClose}
+          aria-hidden="true"
         />
 
-        {/* Dialog Panel */}
         <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={showHeader && title ? titleId : undefined}
           className={cn(
-            'relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all sm:my-8 w-full border border-slate-100 animate-in zoom-in-95 duration-200 z-10',
-            maxWidthClasses[maxWidth]
+            'relative transform overflow-hidden rounded-xl bg-surface text-left shadow-xl transition-all sm:my-8 w-full border border-border-subtle animate-in zoom-in-95 duration-200 z-10',
+            maxWidthClasses[maxWidth],
           )}
         >
           {showHeader && (
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-              <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+            <div className="flex items-center justify-between border-b border-border-subtle px-6 py-4">
+              <h3 id={titleId} className="text-base font-semibold text-foreground">{title}</h3>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                aria-label="Close dialog"
+                className="rounded-lg min-h-11 min-w-11 inline-flex items-center justify-center text-foreground-subtle hover:bg-surface-sunken hover:text-foreground-muted transition-colors focus:outline-hidden focus:ring-2 focus-ring"
               >
                 <X className="w-5 h-5" />
               </button>

@@ -14,7 +14,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, InputProps>((props, re
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="text-slate-400 hover:text-slate-600 focus:outline-hidden"
+          className="text-foreground-subtle hover:text-foreground-muted focus:outline-hidden"
           title={showPassword ? 'Hide password' : 'Show password'}
         >
           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

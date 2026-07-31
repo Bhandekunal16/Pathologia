@@ -9,34 +9,31 @@ import {
   KeyRound,
   UserCheck,
   UserX,
-  MoreVertical,
-  Filter,
 } from 'lucide-react';
 import { PageHeader } from '../components/common/PageHeader';
-import { SearchInput } from '../components/common/SearchInput';
+import { FilterBar } from '../components/common/FilterBar';
+import { DropdownMenu } from '../components/common/DropdownMenu';
 import { RoleBadge } from '../components/common/RoleBadge';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { Avatar } from '../components/common/Avatar';
 import { DataTable } from '../components/table/DataTable';
+import { IconButton } from '../components/ui/IconButton';
 import { DeleteUserModal } from '../features/users/DeleteUserModal';
 import { ResetPasswordModal } from '../features/users/ResetPasswordModal';
 import { ActivateUserModal } from '../features/users/ActivateUserModal';
 import { useUsers } from '../hooks/useUsers';
-import { formatDate } from '../utils/formatters';
 import { User } from '../types/auth.types';
 import { UserRole, UserStatus } from '../types/common.types';
 
 export const UserListPage: React.FC = () => {
   const navigate = useNavigate();
 
-  // Filters state
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Modals state
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
@@ -74,7 +71,6 @@ export const UserListPage: React.FC = () => {
     setPage(1);
   };
 
-  // Action handlers
   const handleDeleteConfirm = async () => {
     if (selectedUser) {
       await deleteUser(selectedUser.id);
@@ -102,7 +98,6 @@ export const UserListPage: React.FC = () => {
     }
   };
 
-  // Table Columns definition
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: 'fullName',
@@ -115,13 +110,13 @@ export const UserListPage: React.FC = () => {
             <div>
               <Link
                 to={`/users/${u.id}`}
-                className="font-bold text-slate-900 hover:text-teal-700 transition-colors"
+                className="table-link"
               >
                 {u.fullName}
               </Link>
-              {u.department && (
-                <div className="text-[11px] text-slate-500 font-normal">{u.department}</div>
-              )}
+              <div className="table-meta">
+                {u.department ? u.department : `@${u.username}`}
+              </div>
             </div>
           </div>
         );
@@ -131,16 +126,7 @@ export const UserListPage: React.FC = () => {
       accessorKey: 'email',
       header: 'Email',
       cell: ({ row }) => (
-        <span className="font-medium text-slate-700">{row.original.email}</span>
-      ),
-    },
-    {
-      accessorKey: 'username',
-      header: 'Username',
-      cell: ({ row }) => (
-        <code className="text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md">
-          @{row.original.username}
-        </code>
+        <span className="table-cell-text">{row.original.email}</span>
       ),
     },
     {
@@ -154,87 +140,68 @@ export const UserListPage: React.FC = () => {
       cell: ({ row }) => <StatusBadge status={row.original.status as UserStatus} />,
     },
     {
-      accessorKey: 'lastLogin',
-      header: 'Last Login',
-      cell: ({ row }) => (
-        <span className="text-slate-500 text-[11px]">
-          {formatDate(row.original.lastLogin)}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'createdAt',
-      header: 'Created At',
-      cell: ({ row }) => (
-        <span className="text-slate-500 text-[11px]">
-          {formatDate(row.original.createdAt)}
-        </span>
-      ),
-    },
-    {
       id: 'actions',
-      header: 'Actions',
+      header: '',
       cell: ({ row }) => {
         const u = row.original;
         return (
-          <div className="flex items-center space-x-1 justify-end">
-            <button
-              type="button"
-              onClick={() => navigate(`/users/${u.id}`)}
-              className="p-1.5 text-slate-500 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors"
+          <div className="flex items-center justify-end gap-1">
+            <IconButton
+              variant="teal"
               title="View Details"
+              aria-label="View user details"
+              onClick={() => navigate(`/users/${u.id}`)}
             >
               <Eye className="w-4 h-4" />
-            </button>
+            </IconButton>
 
-            <button
-              type="button"
-              onClick={() => navigate(`/users/${u.id}/edit`)}
-              className="p-1.5 text-slate-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+            <IconButton
+              variant="blue"
               title="Edit User"
+              aria-label="Edit user"
+              onClick={() => navigate(`/users/${u.id}/edit`)}
             >
               <Edit className="w-4 h-4" />
-            </button>
+            </IconButton>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedUser(u);
-                setIsActivateOpen(true);
-              }}
-              className={`p-1.5 rounded-lg transition-colors ${
-                u.status === 'ACTIVE'
-                  ? 'text-slate-500 hover:text-amber-700 hover:bg-amber-50'
-                  : 'text-slate-500 hover:text-emerald-700 hover:bg-emerald-50'
-              }`}
-              title={u.status === 'ACTIVE' ? 'Deactivate User' : 'Activate User'}
-            >
-              {u.status === 'ACTIVE' ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedUser(u);
-                setIsResetOpen(true);
-              }}
-              className="p-1.5 text-slate-500 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors"
-              title="Reset Password"
-            >
-              <KeyRound className="w-4 h-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedUser(u);
-                setIsDeleteOpen(true);
-              }}
-              className="p-1.5 text-slate-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
-              title="Delete User"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <DropdownMenu
+              triggerLabel="User actions"
+              items={[
+                {
+                  id: 'status',
+                  label: u.status === 'ACTIVE' ? 'Deactivate User' : 'Activate User',
+                  icon:
+                    u.status === 'ACTIVE' ? (
+                      <UserX className="w-4 h-4" />
+                    ) : (
+                      <UserCheck className="w-4 h-4" />
+                    ),
+                  onClick: () => {
+                    setSelectedUser(u);
+                    setIsActivateOpen(true);
+                  },
+                },
+                {
+                  id: 'reset',
+                  label: 'Reset Password',
+                  icon: <KeyRound className="w-4 h-4" />,
+                  onClick: () => {
+                    setSelectedUser(u);
+                    setIsResetOpen(true);
+                  },
+                },
+                {
+                  id: 'delete',
+                  label: 'Delete User',
+                  icon: <Trash2 className="w-4 h-4" />,
+                  variant: 'danger',
+                  onClick: () => {
+                    setSelectedUser(u);
+                    setIsDeleteOpen(true);
+                  },
+                },
+              ]}
+            />
           </div>
         );
       },
@@ -250,7 +217,7 @@ export const UserListPage: React.FC = () => {
           <button
             type="button"
             onClick={() => navigate('/users/new')}
-            className="inline-flex items-center space-x-2 px-4 py-2 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-xs hover:shadow-md transition-all"
+            className="btn-primary"
           >
             <UserPlus className="w-4 h-4" />
             <span>Create New User</span>
@@ -258,20 +225,17 @@ export const UserListPage: React.FC = () => {
         }
       />
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-        <SearchInput value={search} onChange={handleSearchChange} />
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filters:</span>
-          </div>
-
+      <div className="data-panel">
+        <FilterBar
+          searchValue={search}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search users by name, email, or username..."
+          variant="embedded"
+        >
           <select
             value={roleFilter}
             onChange={handleRoleChange}
-            className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:outline-hidden focus:ring-2 focus:ring-teal-500/20"
+            className="form-select"
           >
             <option value="">All Roles</option>
             <option value="ADMIN">Admin</option>
@@ -282,31 +246,30 @@ export const UserListPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={handleStatusChange}
-            className="px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-medium focus:outline-hidden focus:ring-2 focus:ring-teal-500/20"
+            className="form-select"
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
           </select>
-        </div>
+        </FilterBar>
+
+        <DataTable
+          columns={columns}
+          data={usersData?.items || []}
+          isLoading={isLoadingUsers}
+          totalRecords={usersData?.total || 0}
+          currentPage={page}
+          totalPages={usersData?.totalPages || 1}
+          limit={limit}
+          onPageChange={setPage}
+          onLimitChange={setLimit}
+          emptyTitle="No pathologists or users found"
+          emptyDescription="Try adjusting your search criteria or role filters."
+          className="data-panel-table"
+        />
       </div>
 
-      {/* Users Data Table */}
-      <DataTable
-        columns={columns}
-        data={usersData?.items || []}
-        isLoading={isLoadingUsers}
-        totalRecords={usersData?.total || 0}
-        currentPage={page}
-        totalPages={usersData?.totalPages || 1}
-        limit={limit}
-        onPageChange={setPage}
-        onLimitChange={setLimit}
-        emptyTitle="No pathologists or users found"
-        emptyDescription="Try adjusting your search criteria or role filters."
-      />
-
-      {/* Action Modals */}
       <DeleteUserModal
         isOpen={isDeleteOpen}
         user={selectedUser}
