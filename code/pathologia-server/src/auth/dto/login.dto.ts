@@ -8,10 +8,10 @@ export class LoginDto {
   })
   @IsString()
   @IsNotEmpty()
-  identifier: string;
+  readonly identifier: string;
 
   @ApiProperty({ example: 'AdminPass1!' })
   @IsString()
   @IsNotEmpty()
-  password: string;
+  readonly password: string;
 }

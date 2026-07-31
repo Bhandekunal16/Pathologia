@@ -3,13 +3,13 @@ import { UserResponseDto } from '../../users/dto/user-response.dto';
 
 export class AuthTokensDto {
   @ApiProperty()
-  accessToken: string;
+  readonly accessToken: string;
 
   @ApiProperty()
-  refreshToken: string;
+  readonly refreshToken: string;
 }
 
 export class AuthResponseDto extends AuthTokensDto {
   @ApiProperty({ type: UserResponseDto })
-  user: UserResponseDto;
+  readonly user: UserResponseDto;
 }
