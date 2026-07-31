@@ -19,7 +19,7 @@ export class TransformResponseInterceptor<T> implements NestInterceptor<
 > {
   constructor(private readonly reflector: Reflector) {}
 
-  intercept(
+  public intercept(
     context: ExecutionContext,
     next: CallHandler<T>,
   ): Observable<ApiSuccessResponse<T | null>> {
