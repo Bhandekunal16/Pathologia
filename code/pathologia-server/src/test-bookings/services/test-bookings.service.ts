@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import type { Request } from 'express';
@@ -9,7 +10,6 @@ import { AuditService } from '../../audit/services/audit.service';
 import {
   compressForStorage,
   decompressFromStorage,
-  validateReportSize,
 } from '../../common/utils/compress-storage.util';
 import { getRequestHostname } from '../../common/utils/get-request-hostname.util';
 import {
@@ -511,14 +511,7 @@ export class TestBookingsService {
     const testItem = this.findBloodTestItem(booking, testItemId);
     this.ensureReportUploadAllowed(testItem.trackingStatus);
 
-    let fileBuffer: Buffer;
-    try {
-      fileBuffer = Buffer.from(dto.data, 'base64');
-      validateReportSize(fileBuffer);
-    } catch {
-      throw new BadRequestException('Invalid or oversized report file');
-    }
-
+    const fileBuffer = Buffer.from(dto.data, 'base64');
     const compressed = compressForStorage(fileBuffer);
     const now = new Date();
 
@@ -585,8 +578,15 @@ export class TestBookingsService {
 
     this.ensureReportDownloadAllowed(testItem.trackingStatus);
 
+    let buffer: Buffer;
+    try {
+      buffer = decompressFromStorage(testItem.reportData);
+    } catch {
+      throw new InternalServerErrorException('Unable to retrieve report file');
+    }
+
     return {
-      buffer: decompressFromStorage(testItem.reportData),
+      buffer,
       fileName: testItem.reportFileName ?? 'report.pdf',
       mimeType: testItem.reportMimeType ?? 'application/octet-stream',
     };
