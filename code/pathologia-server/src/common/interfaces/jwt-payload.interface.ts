@@ -1,10 +1,12 @@
+import { Role } from '../../shared/enums/role.enum';
+
 export interface AuthJwtPayload {
-  sub: string;
-  email: string;
-  username: string;
-  role: string;
+  readonly sub: string;
+  readonly email: string;
+  readonly username: string;
+  readonly role: Role;
 }
 
 export interface AuthenticatedUser extends AuthJwtPayload {
-  userId: string;
+  readonly userId: string;
 }

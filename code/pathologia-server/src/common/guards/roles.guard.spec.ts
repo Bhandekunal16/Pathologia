@@ -1,4 +1,8 @@
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from './roles.guard';
 import { Role } from '../../shared/enums/role.enum';
@@ -25,7 +29,9 @@ describe('RolesGuard', () => {
 
   it('should allow access when no roles are required', () => {
     jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(undefined);
-    expect(guard.canActivate(createContext({ role: Role.PATHOLOGIST }))).toBe(true);
+    expect(guard.canActivate(createContext({ role: Role.PATHOLOGIST }))).toBe(
+      true,
+    );
   });
 
   it('should allow access when user has required role', () => {
@@ -40,8 +46,17 @@ describe('RolesGuard', () => {
     ).toThrow(ForbiddenException);
   });
 
+  it('should reject unauthenticated requests when roles are required', () => {
+    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([Role.ADMIN]);
+    expect(() => guard.canActivate(createContext())).toThrow(
+      UnauthorizedException,
+    );
+  });
+
   it('should read roles metadata key', () => {
-    const spy = jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([Role.ADMIN]);
+    const spy = jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue([Role.ADMIN]);
     guard.canActivate(createContext({ role: Role.ADMIN }));
     expect(spy).toHaveBeenCalledWith(ROLES_KEY, expect.any(Array));
   });

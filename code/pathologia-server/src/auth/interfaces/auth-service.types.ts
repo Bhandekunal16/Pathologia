@@ -1,4 +1,5 @@
 import type { Request } from 'express';
+import { Role } from '../../shared/enums/role.enum';
 import { Status } from '../../shared/enums/status.enum';
 
 export type JwtExpiresIn = `${number}${'s' | 'm' | 'h' | 'd'}`;
@@ -7,7 +8,7 @@ export interface JwtUser {
   _id: { toString(): string };
   email: string;
   username: string;
-  role: string;
+  role: Role;
 }
 
 export interface AuthSourceUser extends JwtUser {

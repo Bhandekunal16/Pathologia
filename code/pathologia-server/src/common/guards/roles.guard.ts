@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../../config/constants';
@@ -14,27 +15,20 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles = this.reflector.getAllAndOverride<readonly Role[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
-    if (!requiredRoles || requiredRoles.length === 0) {
-      return true;
-    }
+    if (!requiredRoles?.length) return true;
 
-    const request = context.switchToHttp().getRequest<{ user: AuthenticatedUser }>();
-    const user = request.user;
+    const { user } = context
+      .switchToHttp()
+      .getRequest<{ user?: AuthenticatedUser }>();
 
-    if (!user) {
-      throw new ForbiddenException('Access denied');
-    }
-
-    const hasRole = requiredRoles.some((role) => user.role === role);
-
-    if (!hasRole) {
+    if (!user) throw new UnauthorizedException();
+    if (!requiredRoles.includes(user.role))
       throw new ForbiddenException('Insufficient permissions');
-    }
 
     return true;
   }
