@@ -1,14 +1,14 @@
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
-import { UserRepository } from '../../users/repositories/user.repository';
+import type { IUserRepository } from '../../users/repositories/user.repository.interface';
 import { Status } from '../../shared/enums/status.enum';
 import { Role } from '../../shared/enums/role.enum';
 import { Types } from 'mongoose';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
-  let userRepository: jest.Mocked<Pick<UserRepository, 'findById'>>;
+  let userRepository: jest.Mocked<Pick<IUserRepository, 'findById'>>;
 
   beforeEach(() => {
     userRepository = {
@@ -19,7 +19,10 @@ describe('JwtStrategy', () => {
       get: jest.fn().mockReturnValue('test-secret'),
     } as unknown as ConfigService;
 
-    strategy = new JwtStrategy(configService, userRepository as UserRepository);
+    strategy = new JwtStrategy(
+      configService,
+      userRepository as IUserRepository,
+    );
   });
 
   it('should return payload for active user', async () => {
