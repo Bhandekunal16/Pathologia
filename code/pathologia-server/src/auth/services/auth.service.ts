@@ -8,19 +8,26 @@ import { compareHash, hashValue } from '../../common/utils/hash.util';
 import { AuthJwtPayload } from '../../common/interfaces/jwt-payload.interface';
 import { AuditAction } from '../../shared/enums/audit-action.enum';
 import { Status } from '../../shared/enums/status.enum';
+import type { IUserRepository } from '../../users/repositories/user.repository.interface';
 import { UserRepository } from '../../users/repositories/user.repository';
+import type { UserDocument } from '../../users/schemas/user.schema';
 import { UserResponseDto } from '../../users/dto/user-response.dto';
 import { LoginDto } from '../dto/login.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly refreshSecret: string;
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
-  ) {}
+  ) {
+    this.refreshSecret =
+      this.configService.getOrThrow<string>('jwt.refreshSecret');
+  }
 
   public async login(
     dto: LoginDto,
@@ -71,7 +78,7 @@ export class AuthService {
     return { ...tokens, user: UserResponseDto.fromDocument(user) };
   }
 
-  async logout(userId: string, request?: Request): Promise<void> {
+  public async logout(userId: string, request?: Request): Promise<void> {
     await this.userRepository.setRefreshTokenHash(userId, null);
 
     this.auditService.log({
@@ -94,55 +101,37 @@ export class AuthService {
     });
   }
 
-  async refresh(refreshToken: string): Promise<AuthResponseDto> {
-    let payload: AuthJwtPayload;
+  public async refresh(refreshToken: string): Promise<AuthResponseDto> {
+    const { sub } = await this.jwtService
+      .verifyAsync<AuthJwtPayload>(refreshToken, { secret: this.refreshSecret })
+      .catch(() => {
+        throw new UnauthorizedException('Invalid refresh token');
+      });
 
-    try {
-      payload = await this.jwtService.verifyAsync<AuthJwtPayload>(
-        refreshToken,
-        {
-          secret: this.configService.get<string>('jwt.refreshSecret'),
-        },
-      );
-    } catch {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
+    const user = await this.userRepository.findByIdWithSecrets(sub);
 
-    const user = await this.userRepository.findByIdWithSecrets(payload.sub);
-    if (!user || user.status !== Status.ACTIVE) {
+    if (!user || user.status !== Status.ACTIVE)
       throw new UnauthorizedException('Invalid refresh token');
-    }
 
-    if (!user.refreshTokenHash) {
+    if (!user.refreshTokenHash)
       throw new UnauthorizedException('Invalid refresh token');
-    }
 
-    const isValidRefresh = await compareHash(
-      refreshToken,
-      user.refreshTokenHash,
-    );
-    if (!isValidRefresh) {
+    if (!(await compareHash(refreshToken, user.refreshTokenHash)))
       throw new UnauthorizedException('Invalid refresh token');
-    }
 
     const tokens = await this.generateTokens(user);
 
-    return {
-      ...tokens,
-      user: UserResponseDto.fromDocument(user),
-    };
+    return { ...tokens, user: UserResponseDto.fromDocument(user) };
   }
 
-  async getMe(userId: string): Promise<UserResponseDto> {
-    const user = await this.userRepository.findById(userId);
-    if (!user) {
-      throw new UnauthorizedException('User not found');
-    }
+  public async getMe(userId: string): Promise<UserResponseDto> {
+    const user = await this.findUserById(userId);
+    if (!user) throw new UnauthorizedException('User not found');
     return UserResponseDto.fromDocument(user);
   }
 
-  async issueAuthResponse(
-    user: {
+  public async issueAuthResponse(
+    sourceUser: {
       _id: { toString(): string };
       email: string;
       username: string;
@@ -152,39 +141,35 @@ export class AuthService {
     },
     request?: Request,
   ): Promise<AuthResponseDto> {
-    const userDocument = await this.userRepository.findById(
-      user._id.toString(),
-    );
-    if (!userDocument || userDocument.status !== Status.ACTIVE) {
-      throw new UnauthorizedException('User account is not active');
-    }
+    const userDocument = await this.findUserById(sourceUser._id.toString());
 
-    const tokens = await this.generateTokens(userDocument);
-    await this.userRepository.updateLastLogin(userDocument._id.toString());
+    if (!userDocument || userDocument.status !== Status.ACTIVE)
+      throw new UnauthorizedException('User account is not active');
+
+    const userId = userDocument._id.toString();
+
+    const [tokens] = await Promise.all([
+      this.generateTokens(userDocument),
+      this.userRepository.updateLastLogin(userId),
+    ]);
 
     this.auditService.log({
-      userId: userDocument._id.toString(),
+      userId,
       action: AuditAction.LOGIN,
       entity: 'User',
-      entityId: userDocument._id.toString(),
+      entityId: userId,
       metadata: {
         request: {
           method: request?.method ?? 'POST',
           path: request?.path ?? '/invites/accept',
         },
-        response: {
-          success: true,
-          entityId: userDocument._id.toString(),
-        },
+        response: { success: true, entityId: userId },
       },
       hostname: getRequestHostname(request),
       userAgent: request?.headers['user-agent'],
     });
 
-    return {
-      ...tokens,
-      user: UserResponseDto.fromDocument(userDocument),
-    };
+    return { ...tokens, user: UserResponseDto.fromDocument(userDocument) };
   }
 
   private async generateTokens(user: {
@@ -225,5 +210,9 @@ export class AuthService {
     );
 
     return { accessToken, refreshToken };
+  }
+
+  private findUserById(id: string): Promise<UserDocument | null> {
+    return (this.userRepository as IUserRepository).findById(id);
   }
 }

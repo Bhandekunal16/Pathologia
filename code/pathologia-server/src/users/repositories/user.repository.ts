@@ -41,7 +41,9 @@ export class UserRepository implements IUserRepository {
     return this.userModel.findOne({ username }).exec();
   }
 
-  async findByEmailOrUsername(identifier: string): Promise<UserDocument | null> {
+  async findByEmailOrUsername(
+    identifier: string,
+  ): Promise<UserDocument | null> {
     const normalized = identifier.toLowerCase();
     return this.userModel
       .findOne({
@@ -51,7 +53,9 @@ export class UserRepository implements IUserRepository {
       .exec();
   }
 
-  async findAll(filter: UserListFilter): Promise<PaginatedResult<UserDocument>> {
+  async findAll(
+    filter: UserListFilter,
+  ): Promise<PaginatedResult<UserDocument>> {
     const page = filter.page ?? 1;
     const limit = filter.limit ?? 10;
     const skip = (page - 1) * limit;
