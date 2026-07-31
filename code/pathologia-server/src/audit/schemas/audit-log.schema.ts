@@ -10,27 +10,27 @@ export type AuditLogDocument = HydratedDocument<AuditLog>;
 })
 export class AuditLog {
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  userId?: Types.ObjectId;
+  public readonly userId?: Types.ObjectId;
 
   @Prop({ type: String, enum: AuditAction, required: true })
-  action: AuditAction;
+  public readonly action: AuditAction;
 
   @Prop({ required: true })
-  entity: string;
+  public readonly entity: string;
 
   @Prop()
-  entityId?: string;
+  public readonly entityId?: string;
 
   @Prop({ type: Object })
-  metadata?: Record<string, unknown>;
+  public readonly metadata?: Record<string, unknown>;
 
   @Prop()
-  hostname?: string;
+  public readonly hostname?: string;
 
   @Prop()
-  userAgent?: string;
+  public readonly userAgent?: string;
 
-  createdAt: Date;
+  public readonly createdAt: Date;
 }
 
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
