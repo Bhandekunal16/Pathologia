@@ -22,56 +22,59 @@ export class AuthService {
     private readonly auditService: AuditService,
   ) {}
 
-  async login(dto: LoginDto, request?: Request): Promise<AuthResponseDto> {
-    const user = await this.userRepository.findByEmailOrUsername(
-      dto.identifier,
-    );
+  public async login(
+    dto: LoginDto,
+    request?: Request,
+  ): Promise<AuthResponseDto> {
+    const { identifier } = dto;
+    const { method, path, headers } = request ?? {};
+    const user = await this.userRepository.findByEmailOrUsername(identifier);
 
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    if (user.status !== Status.ACTIVE) {
+    const { status, password, _id } = user;
+
+    if (status !== Status.ACTIVE)
       throw new UnauthorizedException('Account is inactive');
-    }
 
-    const isPasswordValid = await compareHash(dto.password, user.password);
-    if (!isPasswordValid) {
+    const isPasswordValid = await compareHash(dto.password, password);
+
+    if (!isPasswordValid)
       throw new UnauthorizedException('Invalid credentials');
-    }
 
-    const tokens = await this.generateTokens(user);
-    await this.userRepository.updateLastLogin(user._id.toString());
+    const userId = _id.toString();
 
-    await this.auditService.log({
-      userId: user._id.toString(),
+    const [tokens] = await Promise.all([
+      this.generateTokens(user),
+      this.userRepository.updateLastLogin(userId),
+    ]);
+
+    this.auditService.log({
+      userId,
       action: AuditAction.LOGIN,
       entity: 'User',
-      entityId: user._id.toString(),
+      entityId: userId,
       metadata: {
         request: {
-          method: request?.method ?? 'POST',
-          path: request?.path ?? '/auth/login',
+          method: method ?? 'POST',
+          path: path ?? '/auth/login',
         },
         response: {
           success: true,
-          entityId: user._id.toString(),
+          entityId: userId,
         },
       },
       hostname: getRequestHostname(request),
-      userAgent: request?.headers['user-agent'],
+      userAgent: headers?.['user-agent'],
     });
 
-    return {
-      ...tokens,
-      user: UserResponseDto.fromDocument(user),
-    };
+    return { ...tokens, user: UserResponseDto.fromDocument(user) };
   }
 
   async logout(userId: string, request?: Request): Promise<void> {
     await this.userRepository.setRefreshTokenHash(userId, null);
 
-    await this.auditService.log({
+    this.auditService.log({
       userId,
       action: AuditAction.LOGOUT,
       entity: 'User',
@@ -159,7 +162,7 @@ export class AuthService {
     const tokens = await this.generateTokens(userDocument);
     await this.userRepository.updateLastLogin(userDocument._id.toString());
 
-    await this.auditService.log({
+    this.auditService.log({
       userId: userDocument._id.toString(),
       action: AuditAction.LOGIN,
       entity: 'User',
