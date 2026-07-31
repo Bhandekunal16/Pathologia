@@ -62,10 +62,7 @@ export class AuditLogPipelineBuilder {
 
   static buildUnwindUserStage(): PipelineStage.Unwind {
     return {
-      $unwind: {
-        path: '$user',
-        preserveNullAndEmptyArrays: true,
-      },
+      $unwind: { path: '$user', preserveNullAndEmptyArrays: true },
     };
   }
 
