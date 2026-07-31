@@ -1,7 +1,11 @@
-export const AUTH_ERRORS = {
-  INVALID_CREDENTIALS: 'Invalid credentials',
-  ACCOUNT_INACTIVE: 'Account is inactive',
-  INVALID_REFRESH_TOKEN: 'Invalid refresh token',
-  USER_NOT_FOUND: 'User not found',
-  USER_NOT_ACTIVE: 'User account is not active',
-} as const;
+import rawConfig from '../../config/json/auth.config.json';
+
+export interface AuthErrors {
+  readonly INVALID_CREDENTIALS: string;
+  readonly ACCOUNT_INACTIVE: string;
+  readonly INVALID_REFRESH_TOKEN: string;
+  readonly USER_NOT_FOUND: string;
+  readonly USER_NOT_ACTIVE: string;
+}
+
+export const AUTH_ERRORS: AuthErrors = rawConfig.AUTH_ERRORS;
