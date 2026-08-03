@@ -13,7 +13,7 @@ describe('JwtStrategy', () => {
   beforeEach(() => {
     userRepository = {
       findById: jest.fn(),
-    };
+    } as unknown as jest.Mocked<Pick<IUserRepository, 'findById'>>;
 
     const configService = {
       get: jest.fn().mockReturnValue('test-secret'),
@@ -21,7 +21,7 @@ describe('JwtStrategy', () => {
 
     strategy = new JwtStrategy(
       configService,
-      userRepository as IUserRepository,
+      userRepository as unknown as IUserRepository,
     );
   });
 

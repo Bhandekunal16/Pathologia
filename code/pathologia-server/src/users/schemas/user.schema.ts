@@ -19,10 +19,22 @@ export class User {
   @Prop({ required: true, select: false })
   password: string;
 
-  @Prop({ type: String, enum: Role, required: true, default: Role.PATHOLOGIST, index: true })
+  @Prop({
+    type: String,
+    enum: Role,
+    required: true,
+    default: Role.PATHOLOGIST,
+    index: true,
+  })
   role: Role;
 
-  @Prop({ type: String, enum: Status, required: true, default: Status.ACTIVE, index: true })
+  @Prop({
+    type: String,
+    enum: Status,
+    required: true,
+    default: Status.ACTIVE,
+    index: true,
+  })
   status: Status;
 
   @Prop({ select: false })
@@ -42,6 +54,3 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.index({ role: 1 });
-UserSchema.index({ status: 1 });
