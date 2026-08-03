@@ -1,0 +1,38 @@
+{
+  "TEMPLATE_FILES": [
+    "welcome",
+    "activation",
+    "reset-password",
+    "temporary-password",
+    "deactivated",
+    "invite",
+    "booking-otp",
+    "booking-confirmation",
+    "blood-test-status",
+    "blood-test-report-uploaded"
+  ],
+  "TEMPLATE_NAME": "templates",
+  "E": "email",
+  "DIRECTORY": {
+    "skip": "..",
+    "source": "src",
+    "build": "dist"
+  },
+  "DATE_CONFIG": {
+    "dateStyle": "medium",
+    "timeStyle": "short"
+  },
+  "LOCALE": "en-IN",
+  "TEMPLATE_TYPES" : {
+    "WELCOME": "welcome",
+    "ACTIVATION": "activation",
+    "RESET_PASSWORD": "reset-password",
+    "TEMPORARY_PASSWORD": "temporary-password",
+    "DEACTIVATED": "deactivated",
+    "INVITE": "invite",
+    "BOOKING_OTP": "booking-otp",
+    "BOOKING_CONFIRMATION": "booking-confirmation",
+    "BLOOD_TEST_STATUS": "blood-test-status",
+    "BLOOD_TEST_REPORT_UPLOADED": "blood-test-report-uploaded"
+  }
+}
