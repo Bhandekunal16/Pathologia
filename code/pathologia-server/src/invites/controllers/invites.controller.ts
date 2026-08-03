@@ -40,7 +40,11 @@ export class InvitesController {
   @ApiBearerAuth()
   @ResponseMessage('Invitation sent successfully')
   @ApiOperation({ summary: 'Invite a user by email (Pathologist only)' })
-  @ApiResponse({ status: 201, description: 'Invitation sent', type: CreateInviteResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Invitation sent',
+    type: CreateInviteResponseDto,
+  })
   create(
     @Body() dto: CreateInviteDto,
     @CurrentUser('sub') userId: string,
@@ -53,7 +57,11 @@ export class InvitesController {
   @Get('validate')
   @ApiOperation({ summary: 'Validate invite token' })
   @ApiQuery({ name: 'token', required: true, type: String })
-  @ApiResponse({ status: 200, description: 'Invite is valid', type: ValidateInviteResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Invite is valid',
+    type: ValidateInviteResponseDto,
+  })
   validate(@Query('token') token: string) {
     return this.invitesService.validateInvite(token);
   }
@@ -62,7 +70,11 @@ export class InvitesController {
   @Post('accept')
   @ResponseMessage('Registration successful')
   @ApiOperation({ summary: 'Complete registration using invite token' })
-  @ApiResponse({ status: 201, description: 'User registered', type: AuthResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'User registered',
+    type: AuthResponseDto,
+  })
   accept(@Body() dto: AcceptInviteDto, @Req() request: Request) {
     return this.invitesService.acceptInvite(dto, request);
   }
