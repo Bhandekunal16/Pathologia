@@ -82,16 +82,12 @@ function resolveOptions(options?: TemplateDirectoryOptions): Required<
 
 function normalizeTemplateExtension(extension: string): string {
   const trimmed = extension.trim();
-  if (!trimmed) {
+  if (!trimmed)
     throw new RangeError('Template extension must be a non-empty string');
-  }
-  if (
-    trimmed.includes('/') ||
-    trimmed.includes('\\') ||
-    trimmed.includes('..')
-  ) {
+
+  if (trimmed.includes('/') || trimmed.includes('\\') || trimmed.includes('..'))
     throw new RangeError(`Unsafe template extension: ${extension}`);
-  }
+
   return trimmed.startsWith('.') ? trimmed : `.${trimmed}`;
 }
 
@@ -101,9 +97,9 @@ function toErrnoException(error: unknown): NodeJS.ErrnoException | undefined {
     error !== null &&
     'code' in error &&
     typeof (error as NodeJS.ErrnoException).code === 'string'
-  ) {
+  )
     return error as NodeJS.ErrnoException;
-  }
+
   return undefined;
 }
 
@@ -187,9 +183,7 @@ export function isPathInsideDirectory(
   const resolvedChild = path.resolve(childPath);
   const relativePath = path.relative(resolvedParent, resolvedChild);
 
-  if (relativePath === '') {
-    return true;
-  }
+  if (relativePath === '') return true;
 
   return (
     !relativePath.startsWith(`..${path.sep}`) &&
@@ -203,30 +197,27 @@ export function assertValidTemplateName(templateName: string): void {
     throw new InvalidTemplateNameError(templateName, 'name must not be empty');
   }
 
-  if (path.isAbsolute(templateName)) {
+  if (path.isAbsolute(templateName))
     throw new InvalidTemplateNameError(
       templateName,
       'absolute paths are not allowed',
     );
-  }
 
   if (
     templateName.includes('..') ||
     templateName.includes('/') ||
     templateName.includes('\\')
-  ) {
+  )
     throw new InvalidTemplateNameError(
       templateName,
       'path separators and traversal segments are not allowed',
     );
-  }
 
-  if (!TEMPLATE_NAME_PATTERN.test(templateName)) {
+  if (!TEMPLATE_NAME_PATTERN.test(templateName))
     throw new InvalidTemplateNameError(
       templateName,
       'name must start with a letter or digit and contain only letters, digits, ".", "_", or "-"',
     );
-  }
 }
 
 export function resolveTemplateDirectory(
@@ -247,18 +238,15 @@ export function resolveTemplateDirectoryWithDiagnostics(
 
   for (const directory of candidates) {
     const stats = safeStatSync(filesystem, directory, collector);
-    if (stats?.isDirectory()) {
+    if (stats?.isDirectory())
       return {
         resolution: { directory, source: 'runtime' },
         errors: collector.errors,
       };
-    }
   }
 
   const fallbackDirectory = candidates[0];
-  if (!fallbackDirectory) {
-    return { resolution: null, errors: collector.errors };
-  }
+  if (!fallbackDirectory) return { resolution: null, errors: collector.errors };
 
   return {
     resolution: { directory: fallbackDirectory, source: 'fallback' },
@@ -297,12 +285,11 @@ export function toTemplateFilePath(
   const resolvedDirectory = path.resolve(directory);
   const resolvedFilePath = path.resolve(resolvedDirectory, fileName);
 
-  if (!isPathInsideDirectory(resolvedDirectory, resolvedFilePath)) {
+  if (!isPathInsideDirectory(resolvedDirectory, resolvedFilePath))
     throw new InvalidTemplateNameError(
       templateName,
       'resolved path escapes the template directory',
     );
-  }
 
   return resolvedFilePath;
 }
