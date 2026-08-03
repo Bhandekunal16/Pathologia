@@ -112,7 +112,7 @@ export interface DeliverMailOptions {
   readonly template: EmailTemplateName;
 }
 
-export interface SmtpPoolTransportOptions extends SMTPPool.Options {}
+export type SmtpPoolTransportOptions = SMTPPool.Options;
 
 export enum EmailDeliveryErrorKind {
   Configuration = 'configuration',

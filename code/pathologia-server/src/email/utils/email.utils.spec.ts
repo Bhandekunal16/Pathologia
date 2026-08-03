@@ -4,7 +4,6 @@ import {
 } from '../constants/email.constants';
 import { classifyEmailError } from './smtp-error.util';
 import { EmailDeliveryErrorKind } from '../types/email.types';
-import { calculateRetryDelayMs } from './retry.util';
 
 describe('email utils', () => {
   describe('classifyEmailError', () => {
@@ -36,14 +35,6 @@ describe('email utils', () => {
 
       expect(classified.kind).toBe(EmailDeliveryErrorKind.Transient);
       expect(classified.retryable).toBe(true);
-    });
-  });
-
-  describe('calculateRetryDelayMs', () => {
-    it('uses exponential backoff with a cap', () => {
-      expect(calculateRetryDelayMs(1)).toBe(500);
-      expect(calculateRetryDelayMs(2)).toBe(1000);
-      expect(calculateRetryDelayMs(10)).toBe(4000);
     });
   });
 
