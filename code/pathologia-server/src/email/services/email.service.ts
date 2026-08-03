@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as handlebars from 'handlebars';
 import * as nodemailer from 'nodemailer';
 import { Transporter } from 'nodemailer';
+import type SMTPPool from 'nodemailer/lib/smtp-pool';
 
 export interface EmailUserContext {
   fullName: string;
@@ -24,23 +25,41 @@ export class EmailService {
   }
 
   private initTransporter(): void {
-    const host = this.configService.get<string>('smtp.host');
-    const port = this.configService.get<number>('smtp.port');
-    const secure = this.configService.get<boolean>('smtp.secure') ?? false;
-    const user = this.configService.get<string>('smtp.user');
-    const pass = this.configService.get<string>('smtp.pass');
+    if (this.transporter) return;
+
+    const smtp = this.configService.get<{
+      host: string;
+      port: number;
+      secure?: boolean;
+      user: string;
+      pass: string;
+    }>('smtp');
+
+    const { host, user, pass, port, secure } = smtp ?? {};
 
     if (!host || !user || !pass) {
       this.logger.warn('SMTP not configured. Emails will be logged only.');
       return;
     }
 
-    this.transporter = nodemailer.createTransport({
+    const smtpOptions: SMTPPool.Options = {
       host,
-      port,
-      secure,
-      auth: { user, pass },
-    });
+      port: port ?? 587,
+      secure: secure ?? false,
+      pool: true,
+      maxConnections: 5,
+      maxMessages: Infinity,
+      auth: {
+        user,
+        pass,
+      },
+    };
+
+    this.transporter = nodemailer.createTransport(smtpOptions);
+
+    void this.transporter
+      .verify()
+      .catch((err) => this.logger.error('SMTP verification failed', err));
   }
 
   private loadTemplates(): void {
@@ -100,7 +119,10 @@ export class EmailService {
     }
   }
 
-  private render(templateName: string, context: Record<string, string | undefined>): string {
+  private render(
+    templateName: string,
+    context: Record<string, string | undefined>,
+  ): string {
     const template = this.templates.get(templateName);
     if (!template) {
       this.logger.error(`Email template "${templateName}" is not loaded`);
@@ -187,7 +209,11 @@ export class EmailService {
         timeStyle: 'short',
       }),
     });
-    await this.sendMail(params.email, 'Pathologia booking verification OTP', html);
+    await this.sendMail(
+      params.email,
+      'Pathologia booking verification OTP',
+      html,
+    );
   }
 
   async sendBookingConfirmationEmail(params: {
@@ -215,7 +241,11 @@ export class EmailService {
       testsHtml,
       totalAmount: `₹${params.totalAmount}`,
     });
-    await this.sendMail(params.email, 'Your Pathologia test booking is confirmed', html);
+    await this.sendMail(
+      params.email,
+      'Your Pathologia test booking is confirmed',
+      html,
+    );
   }
 
   async sendBloodTestStatusEmail(params: {
