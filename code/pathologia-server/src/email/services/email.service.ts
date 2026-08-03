@@ -90,14 +90,14 @@ export class EmailService {
     this.from = this.configService.get<string>('smtp.from') ?? '';
   }
 
-  statusProvider(status: string): BloodTestStatusContent {
+  public statusProvider(status: string): BloodTestStatusContent {
     return (
       BLOOD_TEST_STATUS_MAP[status as keyof typeof BLOOD_TEST_STATUS_MAP] ??
       DEFAULT_BLOOD_TEST_STATUS
     );
   }
 
-  async sendWelcomeEmail(user: EmailUserContext): Promise<void> {
+  public async sendWelcomeEmail(user: EmailUserContext): Promise<void> {
     const { fullName, email, username } = user;
     await this.sendTemplateEmail({
       to: email,
@@ -111,7 +111,7 @@ export class EmailService {
     });
   }
 
-  async sendActivationEmail(user: EmailUserContext): Promise<void> {
+  public async sendActivationEmail(user: EmailUserContext): Promise<void> {
     const { fullName, email } = user;
     await this.sendTemplateEmail({
       to: email,
@@ -121,7 +121,7 @@ export class EmailService {
     });
   }
 
-  async sendResetPassword(
+  public async sendResetPassword(
     user: EmailUserContext,
     resetLink: string,
   ): Promise<void> {
@@ -134,7 +134,7 @@ export class EmailService {
     });
   }
 
-  async sendTemporaryPassword(
+  public async sendTemporaryPassword(
     user: EmailUserContext,
     temporaryPassword: string,
   ): Promise<void> {
@@ -147,7 +147,7 @@ export class EmailService {
     });
   }
 
-  async sendDeactivationEmail(user: EmailUserContext): Promise<void> {
+  public async sendDeactivationEmail(user: EmailUserContext): Promise<void> {
     const { fullName, email } = user;
     await this.sendTemplateEmail({
       to: email,
@@ -157,7 +157,7 @@ export class EmailService {
     });
   }
 
-  async sendInviteEmail(params: {
+  public async sendInviteEmail(params: {
     email: string;
     inviterName: string;
     inviteLink: string;
@@ -176,7 +176,7 @@ export class EmailService {
     });
   }
 
-  async sendBookingOtpEmail(params: {
+  public async sendBookingOtpEmail(params: {
     email: string;
     patientName: string;
     pathologistName: string;
@@ -197,7 +197,7 @@ export class EmailService {
     });
   }
 
-  async sendBookingConfirmationEmail(params: {
+  public async sendBookingConfirmationEmail(params: {
     email: string;
     patientName: string;
     bookedByName: string;
@@ -228,7 +228,7 @@ export class EmailService {
     });
   }
 
-  async sendBloodTestStatusEmail(params: {
+  public async sendBloodTestStatusEmail(params: {
     email: string;
     patientName: string;
     testName: string;
@@ -250,7 +250,7 @@ export class EmailService {
     });
   }
 
-  async sendBloodTestReportUploadedEmail(params: {
+  public async sendBloodTestReportUploadedEmail(params: {
     email: string;
     patientName: string;
     testName: string;
@@ -338,9 +338,7 @@ export class EmailService {
           return;
         }
 
-        if (retryCount >= SMTP_RETRY_CONFIG.maxRetries) {
-          break;
-        }
+        if (retryCount >= SMTP_RETRY_CONFIG.maxRetries) break;
 
         retryCount += 1;
         const delayMs = calculateRetryDelayMs(retryCount);
