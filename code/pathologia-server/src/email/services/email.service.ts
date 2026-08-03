@@ -61,10 +61,8 @@ const {
 
 const DATE_CONFIG = config.DATE_CONFIG as Intl.DateTimeFormatOptions;
 const LOCALE = config.LOCALE as string;
-
 const { skip, source, build }: { skip: string; source: string; build: string } =
   DIRECTORY;
-
 const TEMPLATE_DIRECTORIES = [
   path.join(__dirname, skip, TEMPLATE_NAME),
   path.join(__dirname, TEMPLATE_NAME),
