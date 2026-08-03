@@ -23,7 +23,7 @@
     "timeStyle": "short"
   },
   "LOCALE": "en-IN",
-  "TEMPLATE_TYPES" : {
+  "TEMPLATE_TYPES": {
     "WELCOME": "welcome",
     "ACTIVATION": "activation",
     "RESET_PASSWORD": "reset-password",
@@ -34,5 +34,21 @@
     "BOOKING_CONFIRMATION": "booking-confirmation",
     "BLOOD_TEST_STATUS": "blood-test-status",
     "BLOOD_TEST_REPORT_UPLOADED": "blood-test-report-uploaded"
+  },
+  "TRANSIENT_SMTP_RESPONSE_CODES": [421, 451],
+  "CONFIGURATION_SMTP_RESPONSE_CODES": [535, 534, 530],
+  "CONFIGURATION_ERROR_CODES": ["EAUTH", "EMESSAGE"],
+  "TRANSIENT_ERROR_CODES": [
+    "ECONNRESET",
+    "ETIMEDOUT",
+    "EPIPE",
+    "ECONNREFUSED",
+    "EHOSTUNREACH",
+    "ENETUNREACH"
+  ],
+  "SMTP_RETRY_CONFIG": {
+    "maxRetries": 3,
+    "baseDelayMs": 500,
+    "maxDelayMs": 4000
   }
 }

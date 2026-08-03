@@ -1,6 +1,24 @@
 import type { BloodTestStatusContent } from '../types/email.types';
+import config from '../../config/json/email.config.json';
 
-/** Centralized email subject lines. */
+const {
+  TRANSIENT_SMTP_RESPONSE_CODES: transientSmtpResponseCodes,
+  CONFIGURATION_SMTP_RESPONSE_CODES: configurationSmtpResponseCodes,
+  CONFIGURATION_ERROR_CODES: configurationErrorCodes,
+  TRANSIENT_ERROR_CODES: transientErrorCodes,
+  SMTP_RETRY_CONFIG: smtpRetryConfig,
+} = config as {
+  TRANSIENT_SMTP_RESPONSE_CODES: readonly number[];
+  CONFIGURATION_SMTP_RESPONSE_CODES: readonly number[];
+  CONFIGURATION_ERROR_CODES: readonly string[];
+  TRANSIENT_ERROR_CODES: readonly string[];
+  SMTP_RETRY_CONFIG: {
+    maxRetries: number;
+    baseDelayMs: number;
+    maxDelayMs: number;
+  };
+};
+
 export const EMAIL_SUBJECTS = {
   WELCOME: 'Welcome to Pathologist Friend',
   ACTIVATION: 'Your account has been activated',
@@ -16,7 +34,6 @@ export const EMAIL_SUBJECTS = {
     `Pathologia: Report uploaded for ${testName}`,
 } as const;
 
-/** Known blood-test tracking statuses rendered in status emails. */
 export const BLOOD_TEST_STATUS_MAP = {
   PROCESSING_COMPLETED: {
     label: 'Processing Completed',
@@ -35,30 +52,16 @@ export const DEFAULT_BLOOD_TEST_STATUS: BloodTestStatusContent = {
   message: 'Unknown Status',
 };
 
-/** SMTP response codes treated as transient (safe to retry). */
-export const TRANSIENT_SMTP_RESPONSE_CODES = new Set([421, 451]);
+export const TRANSIENT_SMTP_RESPONSE_CODES = new Set(
+  transientSmtpResponseCodes,
+);
+export const CONFIGURATION_SMTP_RESPONSE_CODES = new Set(
+  configurationSmtpResponseCodes,
+);
+export const CONFIGURATION_ERROR_CODES = new Set(configurationErrorCodes);
+export const TRANSIENT_ERROR_CODES = new Set(transientErrorCodes);
 
-/** Node/network error codes treated as transient (safe to retry). */
-export const TRANSIENT_ERROR_CODES = new Set([
-  'ECONNRESET',
-  'ETIMEDOUT',
-  'EPIPE',
-  'ECONNREFUSED',
-  'EHOSTUNREACH',
-  'ENETUNREACH',
-]);
-
-/** SMTP/auth error codes that indicate configuration problems (no retry). */
-export const CONFIGURATION_ERROR_CODES = new Set(['EAUTH', 'EMESSAGE']);
-
-/** SMTP response codes that indicate authentication/configuration problems. */
-export const CONFIGURATION_SMTP_RESPONSE_CODES = new Set([535, 534, 530]);
-
-export const SMTP_RETRY_CONFIG = {
-  maxRetries: 3,
-  baseDelayMs: 500,
-  maxDelayMs: 4_000,
-} as const;
+export const SMTP_RETRY_CONFIG = smtpRetryConfig;
 
 export const TEMPLATE_FALLBACK_HTML =
   '<p>We were unable to render this email. Please contact support.</p>';
