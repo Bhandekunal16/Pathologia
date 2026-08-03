@@ -179,9 +179,6 @@ function safeReadFileSync(
   }
 }
 
-/**
- * Returns `true` when `childPath` resolves to `parentDirectory` or a path inside it.
- */
 export function isPathInsideDirectory(
   parentDirectory: string,
   childPath: string,
