@@ -15,19 +15,52 @@ export const DEFAULT_PASSWORD_POLICY = {
   specialChars: '@$!%*?&#',
 } as const satisfies PasswordPolicy;
 
+interface CompiledPasswordPolicy {
+  readonly minLength: number;
+  readonly specialChars: string;
+  readonly specialCharSet: ReadonlySet<string>;
+}
+
+const COMPILED_DEFAULT_PASSWORD_POLICY: CompiledPasswordPolicy = {
+  minLength: DEFAULT_PASSWORD_POLICY.minLength,
+  specialChars: DEFAULT_PASSWORD_POLICY.specialChars,
+  specialCharSet: new Set(DEFAULT_PASSWORD_POLICY.specialChars),
+};
+
+const compiledPolicyCache = new Map<string, CompiledPasswordPolicy>();
+
+function getCompiledPolicy(policy: PasswordPolicy): CompiledPasswordPolicy {
+  if (policy === DEFAULT_PASSWORD_POLICY)
+    return COMPILED_DEFAULT_PASSWORD_POLICY;
+
+  const cacheKey = `${policy.minLength}\0${policy.specialChars}`;
+  let compiled = compiledPolicyCache.get(cacheKey);
+  if (!compiled) {
+    compiled = {
+      minLength: policy.minLength,
+      specialChars: policy.specialChars,
+      specialCharSet: new Set(policy.specialChars),
+    };
+    compiledPolicyCache.set(cacheKey, compiled);
+  }
+
+  return compiled;
+}
+
 export function getStrongPasswordMessage(
   policy: PasswordPolicy = DEFAULT_PASSWORD_POLICY,
 ): string {
-  return `Password must be at least ${policy.minLength} characters and include uppercase, lowercase, number, and special character`;
+  const compiled = getCompiledPolicy(policy);
+  return `Password must be at least ${compiled.minLength} characters and include uppercase, lowercase, digit, and at least one of the following special characters: ${compiled.specialChars}`;
 }
 
 export function isStrongPassword(
   value: string,
   policy: PasswordPolicy = DEFAULT_PASSWORD_POLICY,
 ): boolean {
-  if (value.length < policy.minLength) {
-    return false;
-  }
+  const compiled = getCompiledPolicy(policy);
+
+  if (value.length < compiled.minLength) return false;
 
   let hasLower = false;
   let hasUpper = false;
@@ -50,7 +83,7 @@ export function isStrongPassword(
       continue;
     }
 
-    if (policy.specialChars.includes(char)) {
+    if (compiled.specialCharSet.has(char)) {
       hasSpecial = true;
       continue;
     }
